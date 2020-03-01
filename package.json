@@ -1,0 +1,63 @@
+{
+  "name": "tsurl",
+  "version": "0.0.0",
+  "description": "Type safe url construction and deconstruction",
+  "main": "dist/index.js",
+  "scripts": {
+    "dist": "rm -rf dist && tsc --project tsconfig.dist.json",
+    "prettier": "prettier --write '**/*.{ts,tsx,js,jsx,json}'",
+    "prettier-check": "prettier --check '**/*.{ts,tsx,js,jsx,json}'",
+    "lint-js": "tslint --project tsconfig.json",
+    "typecheck": "tsc --project tsconfig.json --noEmit",
+    "lint": "npm run prettier-check && npm run typecheck && npm run lint-js",
+    "tests": "jest",
+    "test": "npm run lint && npm run tests -- --coverage --runInBand",
+    "prepublishOnly": "npm test && npm run dist"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jakesidsmith/tsurl.git"
+  },
+  "keywords": [
+    "type",
+    "safe",
+    "typescript",
+    "url",
+    "path",
+    "construct",
+    "deconstruct",
+    "encode",
+    "decode",
+    "query",
+    "params"
+  ],
+  "author": "Jake 'Sid' Smith",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/jakesidsmith/tsurl/issues"
+  },
+  "homepage": "https://github.com/jakesidsmith/tsurl#readme",
+  "dependencies": {
+    "@types/decode-uri-component": "^0.2.0",
+    "@types/encodeurl": "^1.0.0",
+    "@types/url-parse": "^1.4.3",
+    "decode-uri-component": "^0.2.0",
+    "encodeurl": "^1.0.2",
+    "path-to-regexp": "^6.1.0",
+    "query-string": "^6.11.0",
+    "typescript": "^3.8.2",
+    "url-parse": "^1.4.7"
+  },
+  "devDependencies": {
+    "@types/jest": "^25.1.3",
+    "jest": "^25.1.0",
+    "prettier": "^1.19.1",
+    "ts-jest": "^25.2.1",
+    "tslint": "^5.20.1",
+    "tslint-config-prettier": "^1.18.0",
+    "tslint-eslint-rules": "^5.4.0"
+  },
+  "peerDependencies": {
+    "typescript": ">=3.7"
+  }
+}
