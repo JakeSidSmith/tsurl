@@ -116,18 +116,18 @@ export type QueryParamsSchema<
 >;
 
 export interface TSURLOptions<
-  RequiredStringQueryKeys extends string,
-  RequiredNumberQueryKeys extends string,
-  RequiredBooleanQueryKeys extends string,
-  RequiredStringArrayQueryKeys extends string,
-  RequiredNumberArrayQueryKeys extends string,
-  RequiredBooleanArrayQueryKeys extends string,
-  OptionalStringQueryKeys extends string,
-  OptionalNumberQueryKeys extends string,
-  OptionalBooleanQueryKeys extends string,
-  OptionalStringArrayQueryKeys extends string,
-  OptionalNumberArrayQueryKeys extends string,
-  OptionalBooleanArrayQueryKeys extends string
+  RequiredStringQueryKeys extends string = never,
+  RequiredNumberQueryKeys extends string = never,
+  RequiredBooleanQueryKeys extends string = never,
+  RequiredStringArrayQueryKeys extends string = never,
+  RequiredNumberArrayQueryKeys extends string = never,
+  RequiredBooleanArrayQueryKeys extends string = never,
+  OptionalStringQueryKeys extends string = never,
+  OptionalNumberQueryKeys extends string = never,
+  OptionalBooleanQueryKeys extends string = never,
+  OptionalStringArrayQueryKeys extends string = never,
+  OptionalNumberArrayQueryKeys extends string = never,
+  OptionalBooleanArrayQueryKeys extends string = never
 > {
   protocol?: string | false;
   trailingSlash?: boolean;
