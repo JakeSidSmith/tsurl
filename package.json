@@ -1,5 +1,5 @@
 {
-  "name": "tsurl",
+  "name": "@jakesidsmith/tsurl",
   "version": "0.0.0",
   "description": "Type safe url construction and deconstruction",
   "main": "dist/index.js",
