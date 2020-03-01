@@ -1,7 +1,7 @@
 {
   "name": "@jakesidsmith/tsurl",
   "version": "0.0.0",
-  "description": "Type safe url construction and deconstruction",
+  "description": "Type safe URL construction and deconstruction",
   "main": "dist/index.js",
   "scripts": {
     "dist": "rm -rf dist && tsc --project tsconfig.dist.json",
