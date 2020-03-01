@@ -6,3 +6,15 @@
 
 .DS_Store
 npm-debug.log*
+
+/.circleci/*
+/tests/*
+/.gitattributes
+/.gitignore
+/.nvmrc
+/.prettierignore
+/.prettierrc.json
+/jest.config.js
+/tsconfig.dist.json
+/tsconfig.json
+/tslint.json
