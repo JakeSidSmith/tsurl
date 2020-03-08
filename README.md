@@ -1,4 +1,4 @@
-# tsurl
+# TSURL
 
 **Type safe URL construction and deconstruction**
 
