@@ -104,3 +104,82 @@ interface Result {
   };
 }
 ```
+
+## API
+
+### createTSURL
+
+The `createTSURL` function, which is the default export, will construct a TSURL instance.
+
+This takes 1 or 2 arguments:
+
+- URL schema - an array of strings and or [parameters](#parameters)
+- An options object (optional) - `Options` - see [Options](#options) for more info
+
+### TSURL.getURLTemplate
+
+Returns a `path-to-regexp` compatible string from your defined schema.
+
+This method takes no arguments.
+
+### TSURL.construct
+
+Creates a string URL/path.
+
+This takes 2 arguments:
+
+- The URL params for this URL - an object with keys that match the required/optional URL params
+- The Query params for this URL - an object with keys that match the required/optional query params
+
+Note: this method will throw an error if you have not supplied required query params somehow (e.g. if you are not using type checking because your app is written in JavaScript, or you have cast your params to `any` in TypeScript).
+
+### TSURL.deconstruct
+
+Returns the URL and query params extracted from a string URL/path.
+
+This takes a single argument:
+
+- URL/path - `string` - the URL you wish to extract parameters from
+
+Note: this method will throw an error if the URL/path does not match the previously defined schema. You should always wrap calls to deconstruct in a try/catch as the string that you provide contains no type information, and we cannot check at compile time.
+
+### Options
+
+The options object is the second argument to the `createTSURL` function. All available options are optional.
+
+Options include:
+
+- protocol - `string | false` - protocol to enforce, or remove if set to `false`. Does nothing by default.
+- trailingSlash - `boolean` - enforce or remove trailing slashes. Does nothing by default.
+- encode - `boolean` - whether to encode the URL when constructing. Defaults to `true`.
+- decode - `boolean` - whether to decode the URL when deconstructing. Default to `true`.
+- normalize - `boolean` - whether to strip **all** double slashes (`//`, including those that may be part of a protocol). Defaults to `true`. You should define an explicit `protocol` to avoid `//` being stripped from the protocol if your URL contains one.
+- queryArrayFormat - how to handle constructing/deconstructing query params. This option is defined by the `query-string` package.
+- queryArrayFormatSeparator - `string` - the separator to use when `queryArrayFormat` is set to `separator`. Defaults to `,`.
+- queryParams - an array of [parameters](#parameters).
+
+### Parameters
+
+There are a lot of functions that you can use to define parameters.
+
+The URL schema supports the following:
+
+```
+requiredString
+requiredNumber
+requiredBoolean
+optionalString
+optionalNumber
+optionalBoolean
+```
+
+In addition to the ones listed above, the query params schema also supports the following:
+
+```
+requiredStringArray
+requiredNumberArray
+requiredBooleanArray
+optionalStringArray
+optionalNumberArray
+optionalBooleanArray
+```
