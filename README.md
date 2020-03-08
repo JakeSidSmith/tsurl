@@ -30,7 +30,7 @@ npm i @jakesidsmith/tsurl -S
 
 If you've ever used `react-router` this should be a great example of how TSURL can improve your code.
 
-Let's define a TSURL for our user details page. This would be something like `/users/id/` where `id` is the users ID. react-router uses `path-to-regexp` behind the scenes and so would require a path with the syntax `/users/:id/`, but TSURL can handle this for you.
+Let's define a TSURL for our user details page. This would be something like `/users/id/` where `id` is the user's ID. `react-router` uses `path-to-regexp` behind the scenes and so would require a path with the syntax `/users/:id/`, but TSURL can handle this for you.
 
 ```ts
 import createTSURL, { requiredString } from '@jakesidsmith/tsurl';
@@ -59,9 +59,9 @@ Now, if you wanted to navigate to this URL you'd probably previously have used s
 const whereWeWantToGo = userDetailURL.construct({ id: 'abc' }, {});
 ```
 
-This will output `/users/abc/` exactly as we'd expect, but would fail type checks if the `id` key was missing from the URL parameters object. The second argument is the query params object, but since we don't need any, we've just left this blank. Note: this method will throw an error if you somehow fail to supply the user id.
+This will output `/users/abc/` exactly as we'd expect, but would fail type checks if the `id` key was missing from the URL parameters object. The second argument is the query params object, but since we don't need any, we've just provided an empty object. Note: this method will throw an error if you somehow fail to supply the user id e.g. not using type checking, or cast your params to `any`.
 
-What if we now needed to extract the current user id from the URL? Well, we can handle that also.
+What if we now needed to extract the current user ID from the URL? Well, we can handle that also.
 
 ```ts
 try {
@@ -72,7 +72,7 @@ try {
 }
 ```
 
-It's sensible to wrap your deconstruct call in a try/catch as if the URL doesn't match the schema previously provided, then this will throw an error.
+It's sensible to wrap your deconstruct calls in a try/catch as if the URL doesn't match the schema previously provided, then this will throw an error. Unfortunately there's no way to check that the URL provided will match the schema at compile time.
 
 ## Example with query params and type casting
 
@@ -113,18 +113,20 @@ The `createTSURL` function, which is the default export, will construct a TSURL 
 
 This takes 1 or 2 arguments:
 
-- URL schema - an array of strings and or [parameters](#parameters)
+- URL schema - an array of `strings` and or [parameters](#parameters)
 - An options object (optional) - `Options` - see [Options](#options) for more info
+
+Returns `TSURL` with inferred keys for URL and query params.
 
 ### TSURL.getURLTemplate
 
-Returns a `path-to-regexp` compatible string from your defined schema.
+Returns a `path-to-regexp` compatible `string` from your defined schema.
 
 This method takes no arguments.
 
 ### TSURL.construct
 
-Creates a string URL/path.
+Returns a `string` URL/path.
 
 This takes 2 arguments:
 
@@ -141,6 +143,21 @@ This takes a single argument:
 
 - URL/path - `string` - the URL you wish to extract parameters from
 
+Returns an object with `urlParams` and `queryParams` keys. Both of these keys will be objects containing the parameters you defined in your schema e.g.
+
+```ts
+interface Result {
+  urlParams: {
+    organization: string;
+  };
+  queryParams: {
+    users: readonly string[];
+    search: string;
+    page: number | undefined;
+  };
+}
+```
+
 Note: this method will throw an error if the URL/path does not match the previously defined schema. You should always wrap calls to deconstruct in a try/catch as the string that you provide contains no type information, and we cannot check at compile time.
 
 ### Options
@@ -149,14 +166,14 @@ The options object is the second argument to the `createTSURL` function. All ava
 
 Options include:
 
-- protocol - `string | false` - protocol to enforce, or remove if set to `false`. Does nothing by default.
-- trailingSlash - `boolean` - enforce or remove trailing slashes. Does nothing by default.
-- encode - `boolean` - whether to encode the URL when constructing. Defaults to `true`.
-- decode - `boolean` - whether to decode the URL when deconstructing. Default to `true`.
-- normalize - `boolean` - whether to strip **all** double slashes (`//`, including those that may be part of a protocol). Defaults to `true`. You should define an explicit `protocol` to avoid `//` being stripped from the protocol if your URL contains one.
-- queryArrayFormat - how to handle constructing/deconstructing query params. This option is defined by the `query-string` package.
-- queryArrayFormatSeparator - `string` - the separator to use when `queryArrayFormat` is set to `separator`. Defaults to `,`.
-- queryParams - an array of [parameters](#parameters).
+- `protocol` - `string | false` - protocol to enforce, or remove if set to `false`. Does nothing by default.
+- `trailingSlash` - `boolean` - enforce or remove trailing slashes. Does nothing by default.
+- `encode` - `boolean` - whether to encode the URL when constructing. Defaults to `true`.
+- `decode` - `boolean` - whether to decode the URL when deconstructing. Default to `true`.
+- `normalize` - `boolean` - whether to strip **all** double slashes (`//`, including those that may be part of a protocol). Defaults to `true`. You should define an explicit `protocol` to avoid `//` being stripped from the protocol if your URL contains one.
+- `queryArrayFormat` - how to handle constructing/deconstructing query params that can have multiple values. This option is defined by the `query-string` package.
+- `queryArrayFormatSeparator` - `string` - the separator to use when `queryArrayFormat` is set to `separator`. Defaults to `,`.
+- `queryParams` - an array of [parameters](#parameters).
 
 ### Parameters
 
@@ -164,22 +181,18 @@ There are a lot of functions that you can use to define parameters.
 
 The URL schema supports the following:
 
-```
-requiredString
-requiredNumber
-requiredBoolean
-optionalString
-optionalNumber
-optionalBoolean
-```
+* `requiredString`
+* `requiredNumber`
+* `requiredBoolean`
+* `optionalString`
+* `optionalNumber`
+* `optionalBoolean`
 
 In addition to the ones listed above, the query params schema also supports the following:
 
-```
-requiredStringArray
-requiredNumberArray
-requiredBooleanArray
-optionalStringArray
-optionalNumberArray
-optionalBooleanArray
-```
+* `requiredStringArray`
+* `requiredNumberArray`
+* `requiredBooleanArray`
+* `optionalStringArray`
+* `optionalNumberArray`
+* `optionalBooleanArray`
