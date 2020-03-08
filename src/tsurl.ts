@@ -136,8 +136,7 @@ export class TSURL<
     const queryParams = queryString.parseUrl(url, {
       decode: this.options.decode,
       arrayFormat: this.options.queryArrayFormat,
-      // Cast necessary due to broken type in query-string
-      arrayFormatSeparator: this.options.queryArrayFormatSeparator as any,
+      arrayFormatSeparator: this.options.queryArrayFormatSeparator,
     }).query;
 
     return {

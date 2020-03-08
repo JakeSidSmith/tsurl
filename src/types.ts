@@ -135,7 +135,7 @@ export interface TSURLOptions<
   decode?: boolean;
   normalize?: boolean;
   queryArrayFormat?: ParseOptions['arrayFormat'];
-  queryArrayFormatSeparator?: string;
+  queryArrayFormatSeparator?: ParseOptions['arrayFormatSeparator'];
   queryParams?: QueryParamsSchema<
     RequiredStringQueryKeys,
     RequiredNumberQueryKeys,

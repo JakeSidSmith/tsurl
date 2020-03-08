@@ -425,7 +425,6 @@ export const constructQuery = (
   return queryString.stringify(filteredQueryParams, {
     encode,
     arrayFormat: queryArrayFormat,
-    // Cast necessary due to broken type in query-string
-    arrayFormatSeparator: queryArrayFormatSeparator as any,
+    arrayFormatSeparator: queryArrayFormatSeparator,
   });
 };
