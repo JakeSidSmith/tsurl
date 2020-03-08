@@ -14,7 +14,7 @@ Built on top of existing libraries that you're probably already using, such as `
 
 ## Browser support
 
-This library only supports the modern browsers (latest Chrome, Firefox, Safari, etc), due to a reliance on `query-string@6` which only has support for modern browsers.
+This library only supports modern browsers (latest Chrome, Firefox, Safari, etc), due to a reliance on `query-string@6` which only has support for modern browsers.
 
 If you need to support older browsers (e.g. Internet Explorer) you should configure your bundler/compiler to compile both `@jakesidsmith/tsurl` and `query-string`.
 
