@@ -18,6 +18,14 @@ This library only supports the modern browsers (latest Chrome, Firefox, Safari, 
 
 If you need to support older browsers (e.g. Internet Explorer) you should configure your bundler/compiler to compile both `@jakesidsmith/tsurl` and `query-string`.
 
+## Installation
+
+```shell
+npm i @jakesidsmith/tsurl -S
+```
+
+`-S` is shorthand for `--save` and will automatically add this to your `package.json` and `package-lock.json` where necessary.
+
 ## Example with react-router
 
 If you've ever used `react-router` this should be a great example of how TSURL can improve your code.
