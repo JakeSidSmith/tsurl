@@ -65,3 +65,34 @@ try {
 ```
 
 It's sensible to wrap your deconstruct call in a try/catch as if the URL doesn't match the schema previously provided, then this will throw an error.
+
+## Example with query params and type casting
+
+Say we have a paginated users list, we may be storing the current page number in the query parameters. No worries, TSURL has got your back.
+
+```ts
+const userListURL = createTSURL(['/users'], {
+  trailingSlash: true,
+  queryParams: [optionalNumber('page')],
+});
+```
+
+Here we've constructed a TSURL instance that will not only enforce that we provide a number (or nothing as we may not want to define the page number for the first page) when constructing a URL for this route, but also will give us sensible types for the parameters when deconstructing.
+
+```ts
+userListURL.construct({}, {}); // Is fine because page is optional
+userListURL.construct({}, { page: 2 }); // Is fine because page should be a number
+
+userListURL.construct({}, { page: '2' }); // Disallowed by types (would error)
+userListURL.construct({}, { page: null }); // Disallowed by types (would error)
+
+// The below deconstruct will handle casting the page query param to a number if found
+userListURL.deconstruct(window.location.href);
+// And output a type matching
+interface Result {
+  urlParams: {};
+  queryParams: {
+    page: number | undefined;
+  };
+}
+```
