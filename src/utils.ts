@@ -27,8 +27,8 @@ import {
   URLParamsSchema,
 } from './types';
 
-export const serializeValue = (
-  part: AnyPart<string>,
+export const serializeValue = <T extends string>(
+  part: AnyPart<T>,
   value: string | undefined | ReadonlyArray<string>
 ) => {
   if (part instanceof RequiredString && typeof value === 'string') {
