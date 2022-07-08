@@ -22,6 +22,8 @@ import {
 } from './params';
 import {
   AnyPart,
+  InferQueryParams,
+  InferURLParams,
   QueryParamsSchema,
   TSURLOptions,
   URLParamsSchema,
@@ -191,21 +193,7 @@ export const serializeURLParams = <
     }
   });
 
-  return serializedParams as S extends readonly (infer V)[]
-    ? {
-        [P in V extends RequiredString<infer Name> ? Name : never]: string;
-      } & {
-        [P in V extends RequiredNumber<infer Name> ? Name : never]: number;
-      } & {
-        [P in V extends RequiredBoolean<infer Name> ? Name : never]: boolean;
-      } & {
-        [P in V extends OptionalString<infer Name> ? Name : never]?: string;
-      } & {
-        [P in V extends OptionalNumber<infer Name> ? Name : never]?: number;
-      } & {
-        [P in V extends OptionalBoolean<infer Name> ? Name : never]?: boolean;
-      }
-    : never;
+  return serializedParams as InferURLParams<S>;
 };
 
 export const serializeQueryParams = <
@@ -239,45 +227,7 @@ export const serializeQueryParams = <
     serializedParams[part.name] = serializeValue(part, value);
   });
 
-  return serializedParams as Q extends readonly (infer V)[]
-    ? {
-        [P in V extends RequiredString<infer Name> ? Name : never]: string;
-      } & {
-        [P in V extends RequiredNumber<infer Name> ? Name : never]: number;
-      } & {
-        [P in V extends RequiredBoolean<infer Name> ? Name : never]: boolean;
-      } & {
-        [P in V extends OptionalString<infer Name> ? Name : never]?: string;
-      } & {
-        [P in V extends OptionalNumber<infer Name> ? Name : never]?: number;
-      } & {
-        [P in V extends OptionalBoolean<infer Name> ? Name : never]?: boolean;
-      } & {
-        [P in V extends RequiredStringArray<infer Name>
-          ? Name
-          : never]: readonly string[];
-      } & {
-        [P in V extends RequiredNumberArray<infer Name>
-          ? Name
-          : never]: readonly number[];
-      } & {
-        [P in V extends RequiredBooleanArray<infer Name>
-          ? Name
-          : never]: readonly boolean[];
-      } & {
-        [P in V extends OptionalStringArray<infer Name>
-          ? Name
-          : never]?: readonly string[];
-      } & {
-        [P in V extends OptionalNumberArray<infer Name>
-          ? Name
-          : never]?: readonly number[];
-      } & {
-        [P in V extends OptionalBooleanArray<infer Name>
-          ? Name
-          : never]?: readonly boolean[];
-      }
-    : never;
+  return serializedParams as InferQueryParams<Q>;
 };
 
 export const constructPath = <S extends URLParamsSchema = readonly never[]>(

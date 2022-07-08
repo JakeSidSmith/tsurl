@@ -1,5 +1,5 @@
-import { ParseOptions } from 'query-string';
-import {
+import type { ParseOptions } from 'query-string';
+import type {
   OptionalBoolean,
   OptionalBooleanArray,
   OptionalNumber,
@@ -67,3 +67,61 @@ export interface TSURLOptions<Q extends QueryParamsSchema> {
   queryArrayFormatSeparator?: ParseOptions['arrayFormatSeparator'];
   queryParams?: Q;
 }
+
+export type InferURLParams<S extends URLParamsSchema = readonly never[]> =
+  S extends readonly (infer V)[]
+    ? {
+        [P in V extends RequiredString<infer Name> ? Name : never]: string;
+      } & {
+        [P in V extends RequiredNumber<infer Name> ? Name : never]: number;
+      } & {
+        [P in V extends RequiredBoolean<infer Name> ? Name : never]: boolean;
+      } & {
+        [P in V extends OptionalString<infer Name> ? Name : never]?: string;
+      } & {
+        [P in V extends OptionalNumber<infer Name> ? Name : never]?: number;
+      } & {
+        [P in V extends OptionalBoolean<infer Name> ? Name : never]?: boolean;
+      }
+    : never;
+
+export type InferQueryParams<Q extends QueryParamsSchema = readonly never[]> =
+  Q extends readonly (infer V)[]
+    ? {
+        [P in V extends RequiredString<infer Name> ? Name : never]: string;
+      } & {
+        [P in V extends RequiredNumber<infer Name> ? Name : never]: number;
+      } & {
+        [P in V extends RequiredBoolean<infer Name> ? Name : never]: boolean;
+      } & {
+        [P in V extends OptionalString<infer Name> ? Name : never]?: string;
+      } & {
+        [P in V extends OptionalNumber<infer Name> ? Name : never]?: number;
+      } & {
+        [P in V extends OptionalBoolean<infer Name> ? Name : never]?: boolean;
+      } & {
+        [P in V extends RequiredStringArray<infer Name>
+          ? Name
+          : never]: readonly string[];
+      } & {
+        [P in V extends RequiredNumberArray<infer Name>
+          ? Name
+          : never]: readonly number[];
+      } & {
+        [P in V extends RequiredBooleanArray<infer Name>
+          ? Name
+          : never]: readonly boolean[];
+      } & {
+        [P in V extends OptionalStringArray<infer Name>
+          ? Name
+          : never]?: readonly string[];
+      } & {
+        [P in V extends OptionalNumberArray<infer Name>
+          ? Name
+          : never]?: readonly number[];
+      } & {
+        [P in V extends OptionalBooleanArray<infer Name>
+          ? Name
+          : never]?: readonly boolean[];
+      }
+    : never;

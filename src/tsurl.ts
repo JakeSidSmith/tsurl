@@ -5,20 +5,12 @@ import urlParse from 'url-parse';
 
 import { DEFAULT_OPTIONS } from './constants';
 import {
-  OptionalBoolean,
-  OptionalBooleanArray,
-  OptionalNumber,
-  OptionalNumberArray,
-  OptionalString,
-  OptionalStringArray,
-  RequiredBoolean,
-  RequiredBooleanArray,
-  RequiredNumber,
-  RequiredNumberArray,
-  RequiredString,
-  RequiredStringArray,
-} from './params';
-import { QueryParamsSchema, TSURLOptions, URLParamsSchema } from './types';
+  InferQueryParams,
+  InferURLParams,
+  QueryParamsSchema,
+  TSURLOptions,
+  URLParamsSchema,
+} from './types';
 import {
   constructPath,
   constructQuery,
@@ -39,60 +31,8 @@ export class TSURL<
   }
 
   public construct(
-    urlParams: S extends readonly (infer V)[]
-      ? {
-          [P in V extends RequiredString<infer Name> ? Name : never]: string;
-        } & {
-          [P in V extends RequiredNumber<infer Name> ? Name : never]: number;
-        } & {
-          [P in V extends RequiredBoolean<infer Name> ? Name : never]: boolean;
-        } & {
-          [P in V extends OptionalString<infer Name> ? Name : never]?: string;
-        } & {
-          [P in V extends OptionalNumber<infer Name> ? Name : never]?: number;
-        } & {
-          [P in V extends OptionalBoolean<infer Name> ? Name : never]?: boolean;
-        }
-      : never,
-    queryParams: Q extends readonly (infer V)[]
-      ? {
-          [P in V extends RequiredString<infer Name> ? Name : never]: string;
-        } & {
-          [P in V extends RequiredNumber<infer Name> ? Name : never]: number;
-        } & {
-          [P in V extends RequiredBoolean<infer Name> ? Name : never]: boolean;
-        } & {
-          [P in V extends OptionalString<infer Name> ? Name : never]?: string;
-        } & {
-          [P in V extends OptionalNumber<infer Name> ? Name : never]?: number;
-        } & {
-          [P in V extends OptionalBoolean<infer Name> ? Name : never]?: boolean;
-        } & {
-          [P in V extends RequiredStringArray<infer Name>
-            ? Name
-            : never]: readonly string[];
-        } & {
-          [P in V extends RequiredNumberArray<infer Name>
-            ? Name
-            : never]: readonly number[];
-        } & {
-          [P in V extends RequiredBooleanArray<infer Name>
-            ? Name
-            : never]: readonly boolean[];
-        } & {
-          [P in V extends OptionalStringArray<infer Name>
-            ? Name
-            : never]?: readonly string[];
-        } & {
-          [P in V extends OptionalNumberArray<infer Name>
-            ? Name
-            : never]?: readonly number[];
-        } & {
-          [P in V extends OptionalBooleanArray<infer Name>
-            ? Name
-            : never]?: readonly boolean[];
-        }
-      : never
+    urlParams: InferURLParams<S>,
+    queryParams: InferQueryParams<Q>
   ) {
     const path = constructPath(urlParams, this.schema, this.options);
 
