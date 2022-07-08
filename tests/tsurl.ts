@@ -10,7 +10,6 @@ describe('TSURL', () => {
   it('should have some default options', () => {
     const instance = new TSURL([]);
 
-    // tslint:disable-next-line:no-string-literal
     expect(instance['options']).toEqual({
       encode: true,
       decode: true,
