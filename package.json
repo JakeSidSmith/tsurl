@@ -8,7 +8,7 @@
     "prettier": "prettier --write '**/*.{ts,tsx,js,jsx,json}'",
     "prettier-check": "prettier --check '**/*.{ts,tsx,js,jsx,json}'",
     "lint-js": "eslint '**/*.{ts,tsx,js,jsx}'",
-    "typecheck": "tsc --project tsconfig.json --noEmit",
+    "typecheck": "tsc --project tsconfig.json --noEmit && tsassert",
     "lint": "npm run prettier-check && npm run typecheck && npm run lint-js",
     "tests": "jest",
     "test": "npm run lint && npm run tests -- --coverage --runInBand",
@@ -45,10 +45,11 @@
     "encodeurl": "^1.0.2",
     "path-to-regexp": "^6.1.0",
     "query-string": "^6.11.1",
-    "typescript": "^3.8.2",
+    "typescript": ">=3.7",
     "url-parse": "^1.4.7"
   },
   "devDependencies": {
+    "@jakesidsmith/tsassert": "^0.3.1",
     "@types/jest": "^25.1.3",
     "@typescript-eslint/eslint-plugin": "^5.30.5",
     "@typescript-eslint/parser": "^5.30.5",

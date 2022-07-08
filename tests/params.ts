@@ -15,6 +15,7 @@ import createTSURL, {
 
 describe('params', () => {
   it('should all be handled by the TSURL deconstruct method (without optional values)', () => {
+    // @tsassert: TSURL<"a", "b", "c1" | "c2", "d", "e", "f", "a", "b", "c1" | "c2", "g", "h", "i", "d", "e", "f", "j", "k", "l">
     const url = createTSURL(
       [
         '/api//test/',
@@ -77,6 +78,7 @@ describe('params', () => {
   });
 
   it('should all be handled by the TSURL deconstruct method (with optional values)', () => {
+    // @tsassert: TSURL<"a", "b", "c1" | "c2", "d", "e", "f", "a", "b", "c1" | "c2", "g", "h", "i", "d", "e", "f1" | "f2", "j", "k", "l">
     const url = createTSURL(
       [
         '/api//test/',
