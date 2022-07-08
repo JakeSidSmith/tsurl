@@ -52,4 +52,6 @@ const createTSURL = <
   return new TSURL(schema, options);
 };
 
+export { createTSURL };
+
 export default createTSURL;
