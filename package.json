@@ -48,7 +48,7 @@
     "url-parse": "^1.4.7"
   },
   "devDependencies": {
-    "@jakesidsmith/tsassert": "^0.3.1",
+    "@jakesidsmith/tsassert": "^0.3.2",
     "@types/jest": "^28.1.4",
     "@typescript-eslint/eslint-plugin": "^5.30.5",
     "@typescript-eslint/parser": "^5.30.5",
@@ -62,8 +62,5 @@
   },
   "peerDependencies": {
     "typescript": ">=3.7"
-  },
-  "overrides": {
-    "typescript": "^4.7.4"
   }
 }
