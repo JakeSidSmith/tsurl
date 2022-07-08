@@ -154,7 +154,7 @@ export class TSURL<
   public getURLTemplate() {
     const urlParams: Record<string, string> = {};
 
-    this.schema.forEach(part => {
+    this.schema.forEach((part) => {
       if (typeof part === 'object') {
         if (isRequired(part)) {
           urlParams[part.name] = `:${part.name}`;

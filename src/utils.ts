@@ -95,14 +95,14 @@ export const serializeValue = (
   ) {
     return ([] as ReadonlyArray<string>)
       .concat(value)
-      .map(sub => parseFloat(sub));
+      .map((sub) => parseFloat(sub));
   }
 
   if (part.type === SYMBOLS.OPTIONAL_NUMBER_ARRAY) {
     if (typeof value === 'string' || Array.isArray(value)) {
       return ([] as ReadonlyArray<string>)
         .concat(value)
-        .map(sub => parseFloat(sub));
+        .map((sub) => parseFloat(sub));
     }
 
     if (typeof value === 'undefined') {
@@ -114,7 +114,7 @@ export const serializeValue = (
     part.type === SYMBOLS.REQUIRED_BOOLEAN_ARRAY &&
     (typeof value === 'string' || Array.isArray(value))
   ) {
-    return ([] as ReadonlyArray<string>).concat(value).map(sub => {
+    return ([] as ReadonlyArray<string>).concat(value).map((sub) => {
       if (sub === 'true') {
         return true;
       }
@@ -129,7 +129,7 @@ export const serializeValue = (
 
   if (part.type === SYMBOLS.OPTIONAL_BOOLEAN_ARRAY) {
     if (typeof value === 'string' || Array.isArray(value)) {
-      return ([] as ReadonlyArray<string>).concat(value).map(sub => {
+      return ([] as ReadonlyArray<string>).concat(value).map((sub) => {
         if (sub === 'true') {
           return true;
         }
@@ -175,7 +175,7 @@ export const serializeURLParams = <
     Partial<Record<OptionalNumberURLKeys, number>> &
     Partial<Record<OptionalBooleanURLKeys, boolean>>;
 
-  schema.forEach(part => {
+  schema.forEach((part) => {
     if (typeof part !== 'string') {
       const value = params[part.name];
 
@@ -251,7 +251,7 @@ export const serializeQueryParams = <
     Partial<Record<OptionalNumberArrayQueryKeys, number>> &
     Partial<Record<OptionalBooleanArrayQueryKeys, boolean>>;
 
-  schema.forEach(part => {
+  schema.forEach((part) => {
     const value = params[part.name];
 
     if (isRequired(part) && typeof value === 'undefined') {
@@ -322,7 +322,7 @@ export const constructPath = (
   const { trailingSlash, protocol, encode, normalize } = options;
 
   let url = urlParamsSchema
-    .map<string>(part => {
+    .map<string>((part) => {
       if (typeof part === 'string') {
         return part;
       }
@@ -412,7 +412,7 @@ export const constructQuery = (
 
   const filteredQueryParams: typeof queryParams = {};
 
-  queryParamsShema.forEach(part => {
+  queryParamsShema.forEach((part) => {
     const value = queryParams[part.name];
 
     if (typeof value !== 'undefined') {

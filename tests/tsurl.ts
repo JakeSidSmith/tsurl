@@ -31,6 +31,7 @@ describe('TSURL', () => {
         { trailingSlash: true }
       );
 
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       expect(() => url1.construct({} as any, {})).toThrow('not provided');
     });
 
