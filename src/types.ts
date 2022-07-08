@@ -32,65 +32,32 @@ export type OptionalPart<T extends string> =
 
 export type AnyPart<T extends string> = RequiredPart<T> | OptionalPart<T>;
 
-export type URLParamsSchema<
-  RequiredStringURLKeys extends string,
-  RequiredNumberURLKeys extends string,
-  RequiredBooleanURLKeys extends string,
-  OptionalStringURLKeys extends string,
-  OptionalNumberURLKeys extends string,
-  OptionalBooleanURLKeys extends string
-> = ReadonlyArray<
+export type URLParamsSchema = ReadonlyArray<
   | string
-  | RequiredString<RequiredStringURLKeys>
-  | RequiredNumber<RequiredNumberURLKeys>
-  | RequiredBoolean<RequiredBooleanURLKeys>
-  | OptionalString<OptionalStringURLKeys>
-  | OptionalNumber<OptionalNumberURLKeys>
-  | OptionalBoolean<OptionalBooleanURLKeys>
+  | RequiredString<string>
+  | RequiredNumber<string>
+  | RequiredBoolean<string>
+  | OptionalString<string>
+  | OptionalNumber<string>
+  | OptionalBoolean<string>
 >;
 
-export type QueryParamsSchema<
-  RequiredStringQueryKeys extends string,
-  RequiredNumberQueryKeys extends string,
-  RequiredBooleanQueryKeys extends string,
-  RequiredStringArrayQueryKeys extends string,
-  RequiredNumberArrayQueryKeys extends string,
-  RequiredBooleanArrayQueryKeys extends string,
-  OptionalStringQueryKeys extends string,
-  OptionalNumberQueryKeys extends string,
-  OptionalBooleanQueryKeys extends string,
-  OptionalStringArrayQueryKeys extends string,
-  OptionalNumberArrayQueryKeys extends string,
-  OptionalBooleanArrayQueryKeys extends string
-> = ReadonlyArray<
-  | RequiredString<RequiredStringQueryKeys>
-  | RequiredNumber<RequiredNumberQueryKeys>
-  | RequiredBoolean<RequiredBooleanQueryKeys>
-  | RequiredStringArray<RequiredStringArrayQueryKeys>
-  | RequiredNumberArray<RequiredNumberArrayQueryKeys>
-  | RequiredBooleanArray<RequiredBooleanArrayQueryKeys>
-  | OptionalString<OptionalStringQueryKeys>
-  | OptionalNumber<OptionalNumberQueryKeys>
-  | OptionalBoolean<OptionalBooleanQueryKeys>
-  | OptionalStringArray<OptionalStringArrayQueryKeys>
-  | OptionalNumberArray<OptionalNumberArrayQueryKeys>
-  | OptionalBooleanArray<OptionalBooleanArrayQueryKeys>
+export type QueryParamsSchema = ReadonlyArray<
+  | RequiredString<string>
+  | RequiredNumber<string>
+  | RequiredBoolean<string>
+  | RequiredStringArray<string>
+  | RequiredNumberArray<string>
+  | RequiredBooleanArray<string>
+  | OptionalString<string>
+  | OptionalNumber<string>
+  | OptionalBoolean<string>
+  | OptionalStringArray<string>
+  | OptionalNumberArray<string>
+  | OptionalBooleanArray<string>
 >;
 
-export interface TSURLOptions<
-  RequiredStringQueryKeys extends string = never,
-  RequiredNumberQueryKeys extends string = never,
-  RequiredBooleanQueryKeys extends string = never,
-  RequiredStringArrayQueryKeys extends string = never,
-  RequiredNumberArrayQueryKeys extends string = never,
-  RequiredBooleanArrayQueryKeys extends string = never,
-  OptionalStringQueryKeys extends string = never,
-  OptionalNumberQueryKeys extends string = never,
-  OptionalBooleanQueryKeys extends string = never,
-  OptionalStringArrayQueryKeys extends string = never,
-  OptionalNumberArrayQueryKeys extends string = never,
-  OptionalBooleanArrayQueryKeys extends string = never
-> {
+export interface TSURLOptions<Q extends QueryParamsSchema> {
   protocol?: string | false;
   trailingSlash?: boolean;
   encode?: boolean;
@@ -98,18 +65,5 @@ export interface TSURLOptions<
   normalize?: boolean;
   queryArrayFormat?: ParseOptions['arrayFormat'];
   queryArrayFormatSeparator?: ParseOptions['arrayFormatSeparator'];
-  queryParams?: QueryParamsSchema<
-    RequiredStringQueryKeys,
-    RequiredNumberQueryKeys,
-    RequiredBooleanQueryKeys,
-    RequiredStringArrayQueryKeys,
-    RequiredNumberArrayQueryKeys,
-    RequiredBooleanArrayQueryKeys,
-    OptionalStringQueryKeys,
-    OptionalNumberQueryKeys,
-    OptionalBooleanQueryKeys,
-    OptionalStringArrayQueryKeys,
-    OptionalNumberArrayQueryKeys,
-    OptionalBooleanArrayQueryKeys
-  >;
+  queryParams?: Q;
 }

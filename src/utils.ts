@@ -84,12 +84,12 @@ export const serializeValue = (
     part instanceof RequiredStringArray &&
     (typeof value === 'string' || Array.isArray(value))
   ) {
-    return ([] as ReadonlyArray<string>).concat(value);
+    return ([] as readonly string[]).concat(value);
   }
 
   if (part instanceof OptionalStringArray) {
     if (typeof value === 'string' || Array.isArray(value)) {
-      return ([] as ReadonlyArray<string>).concat(value);
+      return ([] as readonly string[]).concat(value);
     }
 
     if (typeof value === 'undefined') {
@@ -101,14 +101,14 @@ export const serializeValue = (
     part instanceof RequiredNumberArray &&
     (typeof value === 'string' || Array.isArray(value))
   ) {
-    return ([] as ReadonlyArray<string>)
+    return ([] as readonly string[])
       .concat(value)
       .map((sub) => parseFloat(sub));
   }
 
   if (part instanceof OptionalNumberArray) {
     if (typeof value === 'string' || Array.isArray(value)) {
-      return ([] as ReadonlyArray<string>)
+      return ([] as readonly string[])
         .concat(value)
         .map((sub) => parseFloat(sub));
     }
@@ -122,7 +122,7 @@ export const serializeValue = (
     part instanceof RequiredBooleanArray &&
     (typeof value === 'string' || Array.isArray(value))
   ) {
-    return ([] as ReadonlyArray<string>).concat(value).map((sub) => {
+    return ([] as readonly string[]).concat(value).map((sub) => {
       if (sub === 'true') {
         return true;
       }
@@ -137,7 +137,7 @@ export const serializeValue = (
 
   if (part instanceof OptionalBooleanArray) {
     if (typeof value === 'string' || Array.isArray(value)) {
-      return ([] as ReadonlyArray<string>).concat(value).map((sub) => {
+      return ([] as readonly string[]).concat(value).map((sub) => {
         if (sub === 'true') {
           return true;
         }
@@ -159,29 +159,21 @@ export const serializeValue = (
 };
 
 export const serializeURLParams = <
-  RequiredStringURLKeys extends string = never,
-  RequiredNumberURLKeys extends string = never,
-  RequiredBooleanURLKeys extends string = never,
-  OptionalStringURLKeys extends string = never,
-  OptionalNumberURLKeys extends string = never,
-  OptionalBooleanURLKeys extends string = never
+  S extends URLParamsSchema = readonly never[]
 >(
   params: Record<string, string | undefined | null | ReadonlyArray<string>>,
-  schema: URLParamsSchema<
-    RequiredStringURLKeys,
-    RequiredNumberURLKeys,
-    RequiredBooleanURLKeys,
-    OptionalStringURLKeys,
-    OptionalNumberURLKeys,
-    OptionalBooleanURLKeys
-  >
+  schema: S
 ) => {
-  const serializedParams = {} as Record<RequiredStringURLKeys, string> &
-    Record<RequiredNumberURLKeys, number> &
-    Record<RequiredBooleanURLKeys, boolean> &
-    Partial<Record<OptionalStringURLKeys, string>> &
-    Partial<Record<OptionalNumberURLKeys, number>> &
-    Partial<Record<OptionalBooleanURLKeys, boolean>>;
+  const serializedParams: Record<
+    string,
+    | undefined
+    | string
+    | number
+    | boolean
+    | readonly string[]
+    | readonly number[]
+    | readonly boolean[]
+  > = {};
 
   schema.forEach((part) => {
     if (typeof part !== 'string') {
@@ -195,69 +187,43 @@ export const serializeURLParams = <
         throw new Error(`Invalid null value for URL param "${part.name}"`);
       }
 
-      serializedParams[part.name] = serializeValue(part, value) as (Record<
-        RequiredStringURLKeys,
-        string
-      > &
-        Record<RequiredNumberURLKeys, number> &
-        Record<RequiredBooleanURLKeys, boolean> &
-        Partial<Record<OptionalStringURLKeys, string>> &
-        Partial<Record<OptionalNumberURLKeys, number>> &
-        Partial<Record<OptionalBooleanURLKeys, boolean>>)[
-        | RequiredStringURLKeys
-        | RequiredNumberURLKeys
-        | RequiredBooleanURLKeys
-        | OptionalStringURLKeys
-        | OptionalNumberURLKeys
-        | OptionalBooleanURLKeys];
+      serializedParams[part.name] = serializeValue(part, value);
     }
   });
 
-  return serializedParams;
+  return serializedParams as S extends readonly (infer V)[]
+    ? {
+        [P in V extends RequiredString<infer Name> ? Name : never]: string;
+      } & {
+        [P in V extends RequiredNumber<infer Name> ? Name : never]: number;
+      } & {
+        [P in V extends RequiredBoolean<infer Name> ? Name : never]: boolean;
+      } & {
+        [P in V extends OptionalString<infer Name> ? Name : never]?: string;
+      } & {
+        [P in V extends OptionalNumber<infer Name> ? Name : never]?: number;
+      } & {
+        [P in V extends OptionalBoolean<infer Name> ? Name : never]?: boolean;
+      }
+    : never;
 };
 
 export const serializeQueryParams = <
-  RequiredStringQueryKeys extends string = never,
-  RequiredNumberQueryKeys extends string = never,
-  RequiredBooleanQueryKeys extends string = never,
-  RequiredStringArrayQueryKeys extends string = never,
-  RequiredNumberArrayQueryKeys extends string = never,
-  RequiredBooleanArrayQueryKeys extends string = never,
-  OptionalStringQueryKeys extends string = never,
-  OptionalNumberQueryKeys extends string = never,
-  OptionalBooleanQueryKeys extends string = never,
-  OptionalStringArrayQueryKeys extends string = never,
-  OptionalNumberArrayQueryKeys extends string = never,
-  OptionalBooleanArrayQueryKeys extends string = never
+  Q extends QueryParamsSchema = readonly never[]
 >(
   params: Record<string, string | undefined | null | ReadonlyArray<string>>,
-  schema: QueryParamsSchema<
-    RequiredStringQueryKeys,
-    RequiredNumberQueryKeys,
-    RequiredBooleanQueryKeys,
-    RequiredStringArrayQueryKeys,
-    RequiredNumberArrayQueryKeys,
-    RequiredBooleanArrayQueryKeys,
-    OptionalStringQueryKeys,
-    OptionalNumberQueryKeys,
-    OptionalBooleanQueryKeys,
-    OptionalStringArrayQueryKeys,
-    OptionalNumberArrayQueryKeys,
-    OptionalBooleanArrayQueryKeys
-  >
+  schema: Q
 ) => {
-  const serializedParams = {} as Record<RequiredStringQueryKeys, string> &
-    Record<RequiredNumberQueryKeys, number> &
-    Record<RequiredBooleanQueryKeys, boolean> &
-    Record<RequiredStringArrayQueryKeys, string> &
-    Record<RequiredNumberArrayQueryKeys, number> &
-    Record<RequiredBooleanArrayQueryKeys, boolean> &
-    Partial<Record<OptionalStringQueryKeys, string>> &
-    Partial<Record<OptionalNumberQueryKeys, number>> &
-    Partial<Record<OptionalBooleanQueryKeys, boolean>> &
-    Partial<Record<OptionalStringArrayQueryKeys, string>> &
-    Partial<Record<OptionalNumberArrayQueryKeys, number>> &
-    Partial<Record<OptionalBooleanArrayQueryKeys, boolean>>;
+  const serializedParams: Record<
+    string,
+    | undefined
+    | string
+    | number
+    | boolean
+    | readonly string[]
+    | readonly number[]
+    | readonly boolean[]
+  > = {};
 
   schema.forEach((part) => {
     const value = params[part.name];
@@ -270,62 +236,54 @@ export const serializeQueryParams = <
       throw new Error(`Invalid null value for URL param "${part.name}"`);
     }
 
-    serializedParams[part.name] = serializeValue(part, value) as (Record<
-      RequiredStringQueryKeys,
-      string
-    > &
-      Record<RequiredNumberQueryKeys, number> &
-      Record<RequiredBooleanQueryKeys, boolean> &
-      Record<RequiredStringArrayQueryKeys, string> &
-      Record<RequiredNumberArrayQueryKeys, number> &
-      Record<RequiredBooleanArrayQueryKeys, boolean> &
-      Partial<Record<OptionalStringQueryKeys, string>> &
-      Partial<Record<OptionalNumberQueryKeys, number>> &
-      Partial<Record<OptionalBooleanQueryKeys, boolean>> &
-      Partial<Record<OptionalStringArrayQueryKeys, string>> &
-      Partial<Record<OptionalNumberArrayQueryKeys, number>> &
-      Partial<Record<OptionalBooleanArrayQueryKeys, boolean>>)[
-      | RequiredStringQueryKeys
-      | RequiredNumberQueryKeys
-      | RequiredBooleanQueryKeys
-      | RequiredStringArrayQueryKeys
-      | RequiredNumberArrayQueryKeys
-      | RequiredBooleanArrayQueryKeys
-      | OptionalStringQueryKeys
-      | OptionalNumberQueryKeys
-      | OptionalBooleanQueryKeys
-      | OptionalStringArrayQueryKeys
-      | OptionalNumberArrayQueryKeys
-      | OptionalBooleanArrayQueryKeys];
+    serializedParams[part.name] = serializeValue(part, value);
   });
 
-  return serializedParams;
+  return serializedParams as Q extends readonly (infer V)[]
+    ? {
+        [P in V extends RequiredString<infer Name> ? Name : never]: string;
+      } & {
+        [P in V extends RequiredNumber<infer Name> ? Name : never]: number;
+      } & {
+        [P in V extends RequiredBoolean<infer Name> ? Name : never]: boolean;
+      } & {
+        [P in V extends OptionalString<infer Name> ? Name : never]?: string;
+      } & {
+        [P in V extends OptionalNumber<infer Name> ? Name : never]?: number;
+      } & {
+        [P in V extends OptionalBoolean<infer Name> ? Name : never]?: boolean;
+      } & {
+        [P in V extends RequiredStringArray<infer Name>
+          ? Name
+          : never]: readonly string[];
+      } & {
+        [P in V extends RequiredNumberArray<infer Name>
+          ? Name
+          : never]: readonly number[];
+      } & {
+        [P in V extends RequiredBooleanArray<infer Name>
+          ? Name
+          : never]: readonly boolean[];
+      } & {
+        [P in V extends OptionalStringArray<infer Name>
+          ? Name
+          : never]?: readonly string[];
+      } & {
+        [P in V extends OptionalNumberArray<infer Name>
+          ? Name
+          : never]?: readonly number[];
+      } & {
+        [P in V extends OptionalBooleanArray<infer Name>
+          ? Name
+          : never]?: readonly boolean[];
+      }
+    : never;
 };
 
-export const constructPath = (
-  urlParams: Record<string, undefined | string | number | boolean>,
-  urlParamsSchema: URLParamsSchema<
-    string,
-    string,
-    string,
-    string,
-    string,
-    string
-  >,
-  options: TSURLOptions<
-    string,
-    string,
-    string,
-    string,
-    string,
-    string,
-    string,
-    string,
-    string,
-    string,
-    string,
-    string
-  >
+export const constructPath = <S extends URLParamsSchema = readonly never[]>(
+  urlParams: Record<string, string | boolean | number>,
+  urlParamsSchema: S,
+  options: Omit<TSURLOptions<readonly never[]>, 'queryParams'>
 ) => {
   const { trailingSlash, protocol, encode, normalize } = options;
 
@@ -345,7 +303,7 @@ export const constructPath = (
         return '';
       }
 
-      return `${value}`;
+      return value.toString();
     })
     .join('/');
 
@@ -376,49 +334,22 @@ export const constructPath = (
   return url;
 };
 
-export const constructQuery = (
+export const constructQuery = <Q extends QueryParamsSchema = readonly never[]>(
   queryParams: Record<
     string,
-    | undefined
     | string
-    | number
     | boolean
-    | ReadonlyArray<string>
-    | ReadonlyArray<number>
-    | ReadonlyArray<boolean>
+    | number
+    | readonly string[]
+    | readonly boolean[]
+    | readonly number[]
   >,
-  queryParamsShema: QueryParamsSchema<
-    string,
-    string,
-    string,
-    string,
-    string,
-    string,
-    string,
-    string,
-    string,
-    string,
-    string,
-    string
-  >,
-  options: TSURLOptions<
-    string,
-    string,
-    string,
-    string,
-    string,
-    string,
-    string,
-    string,
-    string,
-    string,
-    string,
-    string
-  >
+  queryParamsShema: Q,
+  options: TSURLOptions<Q>
 ) => {
   const { encode, queryArrayFormat, queryArrayFormatSeparator } = options;
 
-  const filteredQueryParams: typeof queryParams = {};
+  const filteredQueryParams: Record<string, unknown> = {};
 
   queryParamsShema.forEach((part) => {
     const value = queryParams[part.name];

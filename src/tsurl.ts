@@ -4,7 +4,21 @@ import queryString from 'query-string';
 import urlParse from 'url-parse';
 
 import { DEFAULT_OPTIONS } from './constants';
-import { TSURLOptions, URLParamsSchema } from './types';
+import {
+  OptionalBoolean,
+  OptionalBooleanArray,
+  OptionalNumber,
+  OptionalNumberArray,
+  OptionalString,
+  OptionalStringArray,
+  RequiredBoolean,
+  RequiredBooleanArray,
+  RequiredNumber,
+  RequiredNumberArray,
+  RequiredString,
+  RequiredStringArray,
+} from './params';
+import { QueryParamsSchema, TSURLOptions, URLParamsSchema } from './types';
 import {
   constructPath,
   constructQuery,
@@ -13,95 +27,72 @@ import {
 } from './utils';
 
 export class TSURL<
-  RequiredStringURLKeys extends string = never,
-  RequiredNumberURLKeys extends string = never,
-  RequiredBooleanURLKeys extends string = never,
-  OptionalStringURLKeys extends string = never,
-  OptionalNumberURLKeys extends string = never,
-  OptionalBooleanURLKeys extends string = never,
-  RequiredStringQueryKeys extends string = never,
-  RequiredNumberQueryKeys extends string = never,
-  RequiredBooleanQueryKeys extends string = never,
-  RequiredStringArrayQueryKeys extends string = never,
-  RequiredNumberArrayQueryKeys extends string = never,
-  RequiredBooleanArrayQueryKeys extends string = never,
-  OptionalStringQueryKeys extends string = never,
-  OptionalNumberQueryKeys extends string = never,
-  OptionalBooleanQueryKeys extends string = never,
-  OptionalStringArrayQueryKeys extends string = never,
-  OptionalNumberArrayQueryKeys extends string = never,
-  OptionalBooleanArrayQueryKeys extends string = never
+  S extends URLParamsSchema = readonly never[],
+  Q extends QueryParamsSchema = readonly never[]
 > {
-  private options: TSURLOptions<
-    RequiredStringQueryKeys,
-    RequiredNumberQueryKeys,
-    RequiredBooleanQueryKeys,
-    RequiredStringArrayQueryKeys,
-    RequiredNumberArrayQueryKeys,
-    RequiredBooleanArrayQueryKeys,
-    OptionalStringQueryKeys,
-    OptionalNumberQueryKeys,
-    OptionalBooleanQueryKeys,
-    OptionalStringArrayQueryKeys,
-    OptionalNumberArrayQueryKeys,
-    OptionalBooleanArrayQueryKeys
-  >;
-  private schema: URLParamsSchema<
-    RequiredStringURLKeys,
-    RequiredNumberURLKeys,
-    RequiredBooleanURLKeys,
-    OptionalStringURLKeys,
-    OptionalNumberURLKeys,
-    OptionalBooleanURLKeys
-  >;
+  private options: TSURLOptions<Q>;
+  private schema: S;
 
-  public constructor(
-    schema: URLParamsSchema<
-      RequiredStringURLKeys,
-      RequiredNumberURLKeys,
-      RequiredBooleanURLKeys,
-      OptionalStringURLKeys,
-      OptionalNumberURLKeys,
-      OptionalBooleanURLKeys
-    >,
-    options: TSURLOptions<
-      RequiredStringQueryKeys,
-      RequiredNumberQueryKeys,
-      RequiredBooleanQueryKeys,
-      RequiredStringArrayQueryKeys,
-      RequiredNumberArrayQueryKeys,
-      RequiredBooleanArrayQueryKeys,
-      OptionalStringQueryKeys,
-      OptionalNumberQueryKeys,
-      OptionalBooleanQueryKeys,
-      OptionalStringArrayQueryKeys,
-      OptionalNumberArrayQueryKeys,
-      OptionalBooleanArrayQueryKeys
-    > = DEFAULT_OPTIONS
-  ) {
+  public constructor(schema: S, options?: TSURLOptions<Q>) {
     this.options = { ...DEFAULT_OPTIONS, ...options };
     this.schema = schema;
   }
 
   public construct(
-    urlParams: Record<RequiredStringURLKeys, string> &
-      Record<RequiredNumberURLKeys, number> &
-      Record<RequiredBooleanURLKeys, boolean> &
-      Partial<Record<OptionalStringURLKeys, string>> &
-      Partial<Record<OptionalNumberURLKeys, number>> &
-      Partial<Record<OptionalBooleanURLKeys, boolean>>,
-    queryParams: Record<RequiredStringQueryKeys, string> &
-      Record<RequiredNumberQueryKeys, number> &
-      Record<RequiredBooleanQueryKeys, boolean> &
-      Record<RequiredStringArrayQueryKeys, string> &
-      Record<RequiredNumberArrayQueryKeys, number> &
-      Record<RequiredBooleanArrayQueryKeys, boolean> &
-      Partial<Record<OptionalStringQueryKeys, string>> &
-      Partial<Record<OptionalNumberQueryKeys, number>> &
-      Partial<Record<OptionalBooleanQueryKeys, boolean>> &
-      Partial<Record<OptionalStringArrayQueryKeys, string>> &
-      Partial<Record<OptionalNumberArrayQueryKeys, number>> &
-      Partial<Record<OptionalBooleanArrayQueryKeys, boolean>>
+    urlParams: S extends readonly (infer V)[]
+      ? {
+          [P in V extends RequiredString<infer Name> ? Name : never]: string;
+        } & {
+          [P in V extends RequiredNumber<infer Name> ? Name : never]: number;
+        } & {
+          [P in V extends RequiredBoolean<infer Name> ? Name : never]: boolean;
+        } & {
+          [P in V extends OptionalString<infer Name> ? Name : never]?: string;
+        } & {
+          [P in V extends OptionalNumber<infer Name> ? Name : never]?: number;
+        } & {
+          [P in V extends OptionalBoolean<infer Name> ? Name : never]?: boolean;
+        }
+      : never,
+    queryParams: Q extends readonly (infer V)[]
+      ? {
+          [P in V extends RequiredString<infer Name> ? Name : never]: string;
+        } & {
+          [P in V extends RequiredNumber<infer Name> ? Name : never]: number;
+        } & {
+          [P in V extends RequiredBoolean<infer Name> ? Name : never]: boolean;
+        } & {
+          [P in V extends OptionalString<infer Name> ? Name : never]?: string;
+        } & {
+          [P in V extends OptionalNumber<infer Name> ? Name : never]?: number;
+        } & {
+          [P in V extends OptionalBoolean<infer Name> ? Name : never]?: boolean;
+        } & {
+          [P in V extends RequiredStringArray<infer Name>
+            ? Name
+            : never]: readonly string[];
+        } & {
+          [P in V extends RequiredNumberArray<infer Name>
+            ? Name
+            : never]: readonly number[];
+        } & {
+          [P in V extends RequiredBooleanArray<infer Name>
+            ? Name
+            : never]: readonly boolean[];
+        } & {
+          [P in V extends OptionalStringArray<infer Name>
+            ? Name
+            : never]?: readonly string[];
+        } & {
+          [P in V extends OptionalNumberArray<infer Name>
+            ? Name
+            : never]?: readonly number[];
+        } & {
+          [P in V extends OptionalBooleanArray<infer Name>
+            ? Name
+            : never]?: readonly boolean[];
+        }
+      : never
   ) {
     const path = constructPath(urlParams, this.schema, this.options);
 
@@ -126,7 +117,9 @@ export class TSURL<
     const template = this.getURLTemplate();
     const parsed = urlParse(this.options.decode ? decodeUrl(url) : url, false);
 
-    const urlMatch = match(template)(parsed.pathname);
+    const urlMatch = match<
+      Record<string, string | undefined | null | ReadonlyArray<string>>
+    >(template)(parsed.pathname);
 
     if (!urlMatch) {
       throw new Error(`Provided url "${url}" was invalid`);
@@ -139,13 +132,10 @@ export class TSURL<
     }).query;
 
     return {
-      urlParams: serializeURLParams(
-        urlMatch.params as Record<string, string | undefined>,
-        this.schema
-      ),
+      urlParams: serializeURLParams(urlMatch.params, this.schema),
       queryParams: serializeQueryParams(
         queryParams,
-        this.options.queryParams || []
+        this.options.queryParams ?? []
       ),
     };
   }
@@ -155,11 +145,8 @@ export class TSURL<
 
     this.schema.forEach((part) => {
       if (typeof part === 'object') {
-        if (part.required) {
-          urlParams[part.name] = `:${part.name}`;
-        } else {
-          urlParams[part.name] = `:${part.name}?`;
-        }
+        const optional = part.required ? '?' : '';
+        urlParams[part.name] = `:${part.name}${optional}`;
       }
     });
 
