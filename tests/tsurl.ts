@@ -19,6 +19,22 @@ describe('TSURL', () => {
     });
   });
 
+  it('should throw if required url params are not provided', () => {
+    // @tsassert: TSURL<"required", never, never, "optional", never, never, never, never, never, never, never, never, never, never, never, never, never, never>
+    const url1 = new TSURL(
+      [
+        '/api/test/',
+        requiredString('required'),
+        optionalString('optional'),
+        '///end',
+      ],
+      { trailingSlash: true }
+    );
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    expect(() => url1.construct({} as any, {})).toThrow('not provided');
+  });
+
   describe('construct', () => {
     it('should throw if required url params are not provided', () => {
       // @tsassert: TSURL<"required", never, never, "optional", never, never, never, never, never, never, never, never, never, never, never, never, never, never>
