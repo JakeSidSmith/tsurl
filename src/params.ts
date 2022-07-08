@@ -1,5 +1,21 @@
+export enum PartType {
+  REQUIRED_STRING = 'REQUIRED_STRING',
+  REQUIRED_NUMBER = 'REQUIRED_NUMBER',
+  REQUIRED_BOOLEAN = 'REQUIRED_BOOLEAN',
+  OPTIONAL_STRING = 'OPTIONAL_STRING',
+  OPTIONAL_NUMBER = 'OPTIONAL_NUMBER',
+  OPTIONAL_BOOLEAN = 'OPTIONAL_BOOLEAN',
+  REQUIRED_STRING_ARRAY = 'REQUIRED_STRING_ARRAY',
+  REQUIRED_NUMBER_ARRAY = 'REQUIRED_NUMBER_ARRAY',
+  REQUIRED_BOOLEAN_ARRAY = 'REQUIRED_BOOLEAN_ARRAY',
+  OPTIONAL_STRING_ARRAY = 'OPTIONAL_STRING_ARRAY',
+  OPTIONAL_NUMBER_ARRAY = 'OPTIONAL_NUMBER_ARRAY',
+  OPTIONAL_BOOLEAN_ARRAY = 'OPTIONAL_BOOLEAN_ARRAY',
+}
+
 export class RequiredString<T extends string> {
-  public required: true = true;
+  public readonly type = PartType.REQUIRED_STRING as const;
+  public readonly required = true as const;
   public name: T;
 
   public constructor(name: T) {
@@ -8,7 +24,8 @@ export class RequiredString<T extends string> {
 }
 
 export class RequiredNumber<T extends string> {
-  public required: true = true;
+  public readonly type = PartType.REQUIRED_NUMBER as const;
+  public readonly required = true as const;
   public name: T;
 
   public constructor(name: T) {
@@ -17,7 +34,8 @@ export class RequiredNumber<T extends string> {
 }
 
 export class RequiredBoolean<T extends string> {
-  public required: true = true;
+  public readonly type = PartType.REQUIRED_BOOLEAN as const;
+  public readonly required = true as const;
   public name: T;
 
   public constructor(name: T) {
@@ -26,7 +44,8 @@ export class RequiredBoolean<T extends string> {
 }
 
 export class RequiredStringArray<T extends string> {
-  public required: true = true;
+  public readonly type = PartType.REQUIRED_STRING_ARRAY as const;
+  public readonly required = true as const;
   public name: T;
 
   public constructor(name: T) {
@@ -35,7 +54,8 @@ export class RequiredStringArray<T extends string> {
 }
 
 export class RequiredNumberArray<T extends string> {
-  public required: true = true;
+  public readonly type = PartType.REQUIRED_NUMBER_ARRAY as const;
+  public readonly required = true as const;
   public name: T;
 
   public constructor(name: T) {
@@ -44,7 +64,8 @@ export class RequiredNumberArray<T extends string> {
 }
 
 export class RequiredBooleanArray<T extends string> {
-  public required: true = true;
+  public readonly type = PartType.REQUIRED_BOOLEAN_ARRAY as const;
+  public readonly required = true as const;
   public name: T;
 
   public constructor(name: T) {
@@ -53,7 +74,8 @@ export class RequiredBooleanArray<T extends string> {
 }
 
 export class OptionalString<T extends string> {
-  public required: false = false;
+  public readonly type = PartType.OPTIONAL_STRING as const;
+  public readonly required = false as const;
   public name: T;
 
   public constructor(name: T) {
@@ -62,7 +84,8 @@ export class OptionalString<T extends string> {
 }
 
 export class OptionalNumber<T extends string> {
-  public required: false = false;
+  public readonly type = PartType.OPTIONAL_NUMBER as const;
+  public readonly required = false as const;
   public name: T;
 
   public constructor(name: T) {
@@ -71,7 +94,8 @@ export class OptionalNumber<T extends string> {
 }
 
 export class OptionalBoolean<T extends string> {
-  public required: false = false;
+  public readonly type = PartType.OPTIONAL_BOOLEAN as const;
+  public readonly required = false as const;
   public name: T;
 
   public constructor(name: T) {
@@ -80,7 +104,8 @@ export class OptionalBoolean<T extends string> {
 }
 
 export class OptionalStringArray<T extends string> {
-  public required: false = false;
+  public readonly type = PartType.OPTIONAL_STRING_ARRAY as const;
+  public readonly required = false as const;
   public name: T;
 
   public constructor(name: T) {
@@ -89,7 +114,8 @@ export class OptionalStringArray<T extends string> {
 }
 
 export class OptionalNumberArray<T extends string> {
-  public required: false = false;
+  public readonly type = PartType.OPTIONAL_NUMBER_ARRAY as const;
+  public readonly required = false as const;
   public name: T;
 
   public constructor(name: T) {
@@ -98,7 +124,8 @@ export class OptionalNumberArray<T extends string> {
 }
 
 export class OptionalBooleanArray<T extends string> {
-  public required: false = false;
+  public readonly type = PartType.OPTIONAL_BOOLEAN_ARRAY as const;
+  public readonly required = false as const;
   public name: T;
 
   public constructor(name: T) {
