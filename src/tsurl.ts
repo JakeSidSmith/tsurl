@@ -4,11 +4,10 @@ import queryString from 'query-string';
 import urlParse from 'url-parse';
 
 import { DEFAULT_OPTIONS } from './constants';
-import * as TYPES from './types';
+import { TSURLOptions, URLParamsSchema } from './types';
 import {
   constructPath,
   constructQuery,
-  isRequired,
   serializeQueryParams,
   serializeURLParams,
 } from './utils';
@@ -33,7 +32,7 @@ export class TSURL<
   OptionalNumberArrayQueryKeys extends string = never,
   OptionalBooleanArrayQueryKeys extends string = never
 > {
-  private options: TYPES.TSURLOptions<
+  private options: TSURLOptions<
     RequiredStringQueryKeys,
     RequiredNumberQueryKeys,
     RequiredBooleanQueryKeys,
@@ -47,7 +46,7 @@ export class TSURL<
     OptionalNumberArrayQueryKeys,
     OptionalBooleanArrayQueryKeys
   >;
-  private schema: TYPES.URLParamsSchema<
+  private schema: URLParamsSchema<
     RequiredStringURLKeys,
     RequiredNumberURLKeys,
     RequiredBooleanURLKeys,
@@ -57,7 +56,7 @@ export class TSURL<
   >;
 
   public constructor(
-    schema: TYPES.URLParamsSchema<
+    schema: URLParamsSchema<
       RequiredStringURLKeys,
       RequiredNumberURLKeys,
       RequiredBooleanURLKeys,
@@ -65,7 +64,7 @@ export class TSURL<
       OptionalNumberURLKeys,
       OptionalBooleanURLKeys
     >,
-    options: TYPES.TSURLOptions<
+    options: TSURLOptions<
       RequiredStringQueryKeys,
       RequiredNumberQueryKeys,
       RequiredBooleanQueryKeys,
@@ -156,7 +155,7 @@ export class TSURL<
 
     this.schema.forEach((part) => {
       if (typeof part === 'object') {
-        if (isRequired(part)) {
+        if (part.required) {
           urlParams[part.name] = `:${part.name}`;
         } else {
           urlParams[part.name] = `:${part.name}?`;

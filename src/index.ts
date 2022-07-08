@@ -1,6 +1,6 @@
 import { DEFAULT_OPTIONS } from './constants';
 import { TSURL } from './tsurl';
-import * as TYPES from './types';
+import { TSURLOptions, URLParamsSchema } from './types';
 
 export * from './params';
 export * from './types';
@@ -26,7 +26,7 @@ const createTSURL = <
   OptionalNumberArrayQueryKeys extends string = never,
   OptionalBooleanArrayQueryKeys extends string = never
 >(
-  schema: TYPES.URLParamsSchema<
+  schema: URLParamsSchema<
     RequiredStringURLKeys,
     RequiredNumberURLKeys,
     RequiredBooleanURLKeys,
@@ -34,7 +34,7 @@ const createTSURL = <
     OptionalNumberURLKeys,
     OptionalBooleanURLKeys
   >,
-  options: TYPES.TSURLOptions<
+  options: TSURLOptions<
     RequiredStringQueryKeys,
     RequiredNumberQueryKeys,
     RequiredBooleanQueryKeys,

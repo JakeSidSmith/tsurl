@@ -1,31 +1,18 @@
 import { ParseOptions } from 'query-string';
-
-import * as SYMBOLS from './symbols';
-
-export interface RequiredString<T extends string> {
-  type: typeof SYMBOLS.REQUIRED_STRING;
-  name: T;
-}
-export interface RequiredNumber<T extends string> {
-  type: typeof SYMBOLS.REQUIRED_NUMBER;
-  name: T;
-}
-export interface RequiredBoolean<T extends string> {
-  type: typeof SYMBOLS.REQUIRED_BOOLEAN;
-  name: T;
-}
-export interface RequiredStringArray<T extends string> {
-  type: typeof SYMBOLS.REQUIRED_STRING_ARRAY;
-  name: T;
-}
-export interface RequiredNumberArray<T extends string> {
-  type: typeof SYMBOLS.REQUIRED_NUMBER_ARRAY;
-  name: T;
-}
-export interface RequiredBooleanArray<T extends string> {
-  type: typeof SYMBOLS.REQUIRED_BOOLEAN_ARRAY;
-  name: T;
-}
+import {
+  OptionalBoolean,
+  OptionalBooleanArray,
+  OptionalNumber,
+  OptionalNumberArray,
+  OptionalString,
+  OptionalStringArray,
+  RequiredBoolean,
+  RequiredBooleanArray,
+  RequiredNumber,
+  RequiredNumberArray,
+  RequiredString,
+  RequiredStringArray,
+} from './params';
 
 export type RequiredPart<T extends string> =
   | RequiredString<T>
@@ -34,31 +21,6 @@ export type RequiredPart<T extends string> =
   | RequiredStringArray<T>
   | RequiredNumberArray<T>
   | RequiredBooleanArray<T>;
-
-export interface OptionalString<T extends string> {
-  type: typeof SYMBOLS.OPTIONAL_STRING;
-  name: T;
-}
-export interface OptionalNumber<T extends string> {
-  type: typeof SYMBOLS.OPTIONAL_NUMBER;
-  name: T;
-}
-export interface OptionalBoolean<T extends string> {
-  type: typeof SYMBOLS.OPTIONAL_BOOLEAN;
-  name: T;
-}
-export interface OptionalStringArray<T extends string> {
-  type: typeof SYMBOLS.OPTIONAL_STRING_ARRAY;
-  name: T;
-}
-export interface OptionalNumberArray<T extends string> {
-  type: typeof SYMBOLS.OPTIONAL_NUMBER_ARRAY;
-  name: T;
-}
-export interface OptionalBooleanArray<T extends string> {
-  type: typeof SYMBOLS.OPTIONAL_BOOLEAN_ARRAY;
-  name: T;
-}
 
 export type OptionalPart<T extends string> =
   | OptionalString<T>

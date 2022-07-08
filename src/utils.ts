@@ -6,39 +6,47 @@ import {
   MATCHES_MAYBE_TRAILING_SLASH,
   MATCHES_MULTIPLE_SLASHES,
 } from './constants';
-import * as SYMBOLS from './symbols';
+import {
+  OptionalBoolean,
+  OptionalBooleanArray,
+  OptionalNumber,
+  OptionalNumberArray,
+  OptionalString,
+  OptionalStringArray,
+  RequiredBoolean,
+  RequiredBooleanArray,
+  RequiredNumber,
+  RequiredNumberArray,
+  RequiredString,
+  RequiredStringArray,
+} from './params';
 import {
   AnyPart,
   QueryParamsSchema,
-  RequiredPart,
   TSURLOptions,
   URLParamsSchema,
 } from './types';
-
-export const isRequired = <T extends string>(
-  part: AnyPart<string>
-): part is RequiredPart<T> => SYMBOLS.REQUIRED.indexOf(part.type) >= 0;
 
 export const serializeValue = (
   part: AnyPart<string>,
   value: string | undefined | ReadonlyArray<string>
 ) => {
-  if (part.type === SYMBOLS.REQUIRED_STRING && typeof value === 'string') {
+  if (part instanceof RequiredString && typeof value === 'string') {
     return value;
   }
 
   if (
-    part.type === SYMBOLS.OPTIONAL_STRING &&
+    part instanceof OptionalString &&
     (typeof value === 'string' || typeof value === 'undefined')
   ) {
     return value;
   }
 
-  if (part.type === SYMBOLS.REQUIRED_NUMBER && typeof value === 'string') {
+  if (part instanceof RequiredNumber && typeof value === 'string') {
     return parseFloat(value);
   }
 
-  if (part.type === SYMBOLS.OPTIONAL_NUMBER) {
+  if (part instanceof OptionalNumber) {
     if (typeof value === 'string') {
       return parseFloat(value);
     }
@@ -48,7 +56,7 @@ export const serializeValue = (
     }
   }
 
-  if (part.type === SYMBOLS.REQUIRED_BOOLEAN && typeof value === 'string') {
+  if (part instanceof RequiredBoolean && typeof value === 'string') {
     if (value === 'true') {
       return true;
     }
@@ -58,7 +66,7 @@ export const serializeValue = (
     }
   }
 
-  if (part.type === SYMBOLS.OPTIONAL_BOOLEAN) {
+  if (part instanceof OptionalBoolean) {
     if (value === 'true') {
       return true;
     }
@@ -73,13 +81,13 @@ export const serializeValue = (
   }
 
   if (
-    part.type === SYMBOLS.REQUIRED_STRING_ARRAY &&
+    part instanceof RequiredStringArray &&
     (typeof value === 'string' || Array.isArray(value))
   ) {
     return ([] as ReadonlyArray<string>).concat(value);
   }
 
-  if (part.type === SYMBOLS.OPTIONAL_STRING_ARRAY) {
+  if (part instanceof OptionalStringArray) {
     if (typeof value === 'string' || Array.isArray(value)) {
       return ([] as ReadonlyArray<string>).concat(value);
     }
@@ -90,7 +98,7 @@ export const serializeValue = (
   }
 
   if (
-    part.type === SYMBOLS.REQUIRED_NUMBER_ARRAY &&
+    part instanceof RequiredNumberArray &&
     (typeof value === 'string' || Array.isArray(value))
   ) {
     return ([] as ReadonlyArray<string>)
@@ -98,7 +106,7 @@ export const serializeValue = (
       .map((sub) => parseFloat(sub));
   }
 
-  if (part.type === SYMBOLS.OPTIONAL_NUMBER_ARRAY) {
+  if (part instanceof OptionalNumberArray) {
     if (typeof value === 'string' || Array.isArray(value)) {
       return ([] as ReadonlyArray<string>)
         .concat(value)
@@ -111,7 +119,7 @@ export const serializeValue = (
   }
 
   if (
-    part.type === SYMBOLS.REQUIRED_BOOLEAN_ARRAY &&
+    part instanceof RequiredBooleanArray &&
     (typeof value === 'string' || Array.isArray(value))
   ) {
     return ([] as ReadonlyArray<string>).concat(value).map((sub) => {
@@ -127,7 +135,7 @@ export const serializeValue = (
     });
   }
 
-  if (part.type === SYMBOLS.OPTIONAL_BOOLEAN_ARRAY) {
+  if (part instanceof OptionalBooleanArray) {
     if (typeof value === 'string' || Array.isArray(value)) {
       return ([] as ReadonlyArray<string>).concat(value).map((sub) => {
         if (sub === 'true') {
@@ -179,7 +187,7 @@ export const serializeURLParams = <
     if (typeof part !== 'string') {
       const value = params[part.name];
 
-      if (isRequired(part) && typeof value === 'undefined') {
+      if (part.required && typeof value === 'undefined') {
         throw new Error(`Required URL param "${part.name}" was undefined`);
       }
 
@@ -254,7 +262,7 @@ export const serializeQueryParams = <
   schema.forEach((part) => {
     const value = params[part.name];
 
-    if (isRequired(part) && typeof value === 'undefined') {
+    if (part.required && typeof value === 'undefined') {
       throw new Error(`Required query param "${part.name}" was undefined`);
     }
 
@@ -330,7 +338,7 @@ export const constructPath = (
       const value = urlParams[part.name];
 
       if (typeof value === 'undefined') {
-        if (isRequired(part)) {
+        if (part.required) {
           throw new Error(`Required URL param "${part.name}" was not provided`);
         }
 
@@ -417,7 +425,7 @@ export const constructQuery = (
 
     if (typeof value !== 'undefined') {
       filteredQueryParams[part.name] = value;
-    } else if (isRequired(part)) {
+    } else if (part.required) {
       throw new Error(`Required query param "${part.name}" was not provided`);
     }
   });
