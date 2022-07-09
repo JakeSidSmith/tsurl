@@ -30,10 +30,10 @@ export class TSURL<
     this.schema = schema;
   }
 
-  public construct(
+  public construct = (
     urlParams: InferURLParams<S>,
     queryParams: InferQueryParams<Q>
-  ) {
+  ) => {
     const path = constructPath(urlParams, this.schema, this.options);
 
     if (!this.options.queryParams?.length) {
@@ -51,9 +51,9 @@ export class TSURL<
     }
 
     return `${path}?${queryParamsString}`;
-  }
+  };
 
-  public deconstruct(url: string) {
+  public deconstruct = (url: string) => {
     const template = this.getURLTemplate();
     const parsed = urlParse(this.options.decode ? decodeUrl(url) : url, false);
 
@@ -78,9 +78,9 @@ export class TSURL<
         this.options.queryParams ?? []
       ),
     };
-  }
+  };
 
-  public getURLTemplate() {
+  public getURLTemplate = () => {
     const urlParams: Record<string, string> = {};
 
     this.schema.forEach((part) => {
@@ -91,5 +91,5 @@ export class TSURL<
     });
 
     return constructPath(urlParams, this.schema, this.options);
-  }
+  };
 }
