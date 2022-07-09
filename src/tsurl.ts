@@ -68,7 +68,9 @@ export class TSURL<
     >(template)(parsed.pathname);
 
     if (!urlMatch) {
-      throw new Error(`Provided url "${url}" was invalid`);
+      throw new Error(
+        `Provided url "${url}" was invalid for template "${template}"`
+      );
     }
 
     const queryParams = queryString.parseUrl(url, {
