@@ -85,7 +85,7 @@ export class TSURL<
 
     this.schema.forEach((part) => {
       if (typeof part === 'object') {
-        const optional = part.required ? '?' : '';
+        const optional = part.required ? '' : '?';
         urlParams[part.name] = `:${part.name}${optional}`;
       }
     });
