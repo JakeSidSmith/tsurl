@@ -42,7 +42,7 @@ export class TSURL<
   ) => {
     const path = constructPath(urlParams, this.schema, this.options);
 
-    if (!this.options.queryParams?.length) {
+    if (!this.options.queryParams.length) {
       return path;
     }
 
