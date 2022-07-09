@@ -8,7 +8,6 @@ import createTSURL, {
 
 describe('TSURL', () => {
   it('should have some default options', () => {
-    // @tsassert: TSURL<never, never, never, never, never, never, never, never, never, never, never, never, never, never, never, never, never, never>
     const instance = new TSURL([]);
 
     expect(instance['options']).toEqual({
@@ -20,7 +19,6 @@ describe('TSURL', () => {
   });
 
   it('should throw if required url params are not provided', () => {
-    // @tsassert: TSURL<"required", never, never, "optional", never, never, never, never, never, never, never, never, never, never, never, never, never, never>
     const url1 = new TSURL(
       [
         '/api/test/',
@@ -37,7 +35,6 @@ describe('TSURL', () => {
 
   describe('construct', () => {
     it('should throw if required url params are not provided', () => {
-      // @tsassert: TSURL<"required", never, never, "optional", never, never, never, never, never, never, never, never, never, never, never, never, never, never>
       const url1 = createTSURL(
         [
           '/api/test/',
