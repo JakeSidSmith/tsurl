@@ -15,6 +15,7 @@ describe('TSURL', () => {
       decode: true,
       normalize: true,
       queryArrayFormatSeparator: ',',
+      queryParams: [],
     });
   });
 
