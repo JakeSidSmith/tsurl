@@ -11,8 +11,8 @@
     "typecheck": "tsc --project tsconfig.json --noEmit && tsassert",
     "lint": "npm run prettier-check && npm run typecheck && npm run lint-js",
     "tests": "jest",
-    "test": "npm run lint && npm run tests -- --coverage --runInBand",
-    "prepublishOnly": "npm test && npm run dist"
+    "test": "npm run lint && npm run tests -- --coverage --runInBand && npm run dist",
+    "prepublishOnly": "npm test"
   },
   "repository": {
     "type": "git",
