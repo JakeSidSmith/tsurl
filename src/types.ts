@@ -1,31 +1,18 @@
-import { ParseOptions } from 'query-string';
-
-import * as SYMBOLS from './symbols';
-
-export interface RequiredString<T extends string> {
-  type: typeof SYMBOLS.REQUIRED_STRING;
-  name: T;
-}
-export interface RequiredNumber<T extends string> {
-  type: typeof SYMBOLS.REQUIRED_NUMBER;
-  name: T;
-}
-export interface RequiredBoolean<T extends string> {
-  type: typeof SYMBOLS.REQUIRED_BOOLEAN;
-  name: T;
-}
-export interface RequiredStringArray<T extends string> {
-  type: typeof SYMBOLS.REQUIRED_STRING_ARRAY;
-  name: T;
-}
-export interface RequiredNumberArray<T extends string> {
-  type: typeof SYMBOLS.REQUIRED_NUMBER_ARRAY;
-  name: T;
-}
-export interface RequiredBooleanArray<T extends string> {
-  type: typeof SYMBOLS.REQUIRED_BOOLEAN_ARRAY;
-  name: T;
-}
+import type { ParseOptions } from 'query-string';
+import type {
+  OptionalBoolean,
+  OptionalBooleanArray,
+  OptionalNumber,
+  OptionalNumberArray,
+  OptionalString,
+  OptionalStringArray,
+  RequiredBoolean,
+  RequiredBooleanArray,
+  RequiredNumber,
+  RequiredNumberArray,
+  RequiredString,
+  RequiredStringArray,
+} from './params';
 
 export type RequiredPart<T extends string> =
   | RequiredString<T>
@@ -34,31 +21,6 @@ export type RequiredPart<T extends string> =
   | RequiredStringArray<T>
   | RequiredNumberArray<T>
   | RequiredBooleanArray<T>;
-
-export interface OptionalString<T extends string> {
-  type: typeof SYMBOLS.OPTIONAL_STRING;
-  name: T;
-}
-export interface OptionalNumber<T extends string> {
-  type: typeof SYMBOLS.OPTIONAL_NUMBER;
-  name: T;
-}
-export interface OptionalBoolean<T extends string> {
-  type: typeof SYMBOLS.OPTIONAL_BOOLEAN;
-  name: T;
-}
-export interface OptionalStringArray<T extends string> {
-  type: typeof SYMBOLS.OPTIONAL_STRING_ARRAY;
-  name: T;
-}
-export interface OptionalNumberArray<T extends string> {
-  type: typeof SYMBOLS.OPTIONAL_NUMBER_ARRAY;
-  name: T;
-}
-export interface OptionalBooleanArray<T extends string> {
-  type: typeof SYMBOLS.OPTIONAL_BOOLEAN_ARRAY;
-  name: T;
-}
 
 export type OptionalPart<T extends string> =
   | OptionalString<T>
@@ -70,65 +32,32 @@ export type OptionalPart<T extends string> =
 
 export type AnyPart<T extends string> = RequiredPart<T> | OptionalPart<T>;
 
-export type URLParamsSchema<
-  RequiredStringURLKeys extends string,
-  RequiredNumberURLKeys extends string,
-  RequiredBooleanURLKeys extends string,
-  OptionalStringURLKeys extends string,
-  OptionalNumberURLKeys extends string,
-  OptionalBooleanURLKeys extends string
-> = ReadonlyArray<
+export type URLParamsSchema = ReadonlyArray<
   | string
-  | RequiredString<RequiredStringURLKeys>
-  | RequiredNumber<RequiredNumberURLKeys>
-  | RequiredBoolean<RequiredBooleanURLKeys>
-  | OptionalString<OptionalStringURLKeys>
-  | OptionalNumber<OptionalNumberURLKeys>
-  | OptionalBoolean<OptionalBooleanURLKeys>
+  | RequiredString<string>
+  | RequiredNumber<string>
+  | RequiredBoolean<string>
+  | OptionalString<string>
+  | OptionalNumber<string>
+  | OptionalBoolean<string>
 >;
 
-export type QueryParamsSchema<
-  RequiredStringQueryKeys extends string,
-  RequiredNumberQueryKeys extends string,
-  RequiredBooleanQueryKeys extends string,
-  RequiredStringArrayQueryKeys extends string,
-  RequiredNumberArrayQueryKeys extends string,
-  RequiredBooleanArrayQueryKeys extends string,
-  OptionalStringQueryKeys extends string,
-  OptionalNumberQueryKeys extends string,
-  OptionalBooleanQueryKeys extends string,
-  OptionalStringArrayQueryKeys extends string,
-  OptionalNumberArrayQueryKeys extends string,
-  OptionalBooleanArrayQueryKeys extends string
-> = ReadonlyArray<
-  | RequiredString<RequiredStringQueryKeys>
-  | RequiredNumber<RequiredNumberQueryKeys>
-  | RequiredBoolean<RequiredBooleanQueryKeys>
-  | RequiredStringArray<RequiredStringArrayQueryKeys>
-  | RequiredNumberArray<RequiredNumberArrayQueryKeys>
-  | RequiredBooleanArray<RequiredBooleanArrayQueryKeys>
-  | OptionalString<OptionalStringQueryKeys>
-  | OptionalNumber<OptionalNumberQueryKeys>
-  | OptionalBoolean<OptionalBooleanQueryKeys>
-  | OptionalStringArray<OptionalStringArrayQueryKeys>
-  | OptionalNumberArray<OptionalNumberArrayQueryKeys>
-  | OptionalBooleanArray<OptionalBooleanArrayQueryKeys>
+export type QueryParamsSchema = ReadonlyArray<
+  | RequiredString<string>
+  | RequiredNumber<string>
+  | RequiredBoolean<string>
+  | RequiredStringArray<string>
+  | RequiredNumberArray<string>
+  | RequiredBooleanArray<string>
+  | OptionalString<string>
+  | OptionalNumber<string>
+  | OptionalBoolean<string>
+  | OptionalStringArray<string>
+  | OptionalNumberArray<string>
+  | OptionalBooleanArray<string>
 >;
 
-export interface TSURLOptions<
-  RequiredStringQueryKeys extends string = never,
-  RequiredNumberQueryKeys extends string = never,
-  RequiredBooleanQueryKeys extends string = never,
-  RequiredStringArrayQueryKeys extends string = never,
-  RequiredNumberArrayQueryKeys extends string = never,
-  RequiredBooleanArrayQueryKeys extends string = never,
-  OptionalStringQueryKeys extends string = never,
-  OptionalNumberQueryKeys extends string = never,
-  OptionalBooleanQueryKeys extends string = never,
-  OptionalStringArrayQueryKeys extends string = never,
-  OptionalNumberArrayQueryKeys extends string = never,
-  OptionalBooleanArrayQueryKeys extends string = never
-> {
+export interface TSURLOptions<Q extends QueryParamsSchema> {
   protocol?: string | false;
   trailingSlash?: boolean;
   encode?: boolean;
@@ -136,18 +65,63 @@ export interface TSURLOptions<
   normalize?: boolean;
   queryArrayFormat?: ParseOptions['arrayFormat'];
   queryArrayFormatSeparator?: ParseOptions['arrayFormatSeparator'];
-  queryParams?: QueryParamsSchema<
-    RequiredStringQueryKeys,
-    RequiredNumberQueryKeys,
-    RequiredBooleanQueryKeys,
-    RequiredStringArrayQueryKeys,
-    RequiredNumberArrayQueryKeys,
-    RequiredBooleanArrayQueryKeys,
-    OptionalStringQueryKeys,
-    OptionalNumberQueryKeys,
-    OptionalBooleanQueryKeys,
-    OptionalStringArrayQueryKeys,
-    OptionalNumberArrayQueryKeys,
-    OptionalBooleanArrayQueryKeys
-  >;
+  queryParams?: Q;
 }
+
+export type InferURLParams<S extends URLParamsSchema = readonly never[]> =
+  S extends readonly (infer V)[]
+    ? {
+        [P in V extends RequiredString<infer Name> ? Name : never]: string;
+      } & {
+        [P in V extends RequiredNumber<infer Name> ? Name : never]: number;
+      } & {
+        [P in V extends RequiredBoolean<infer Name> ? Name : never]: boolean;
+      } & {
+        [P in V extends OptionalString<infer Name> ? Name : never]?: string;
+      } & {
+        [P in V extends OptionalNumber<infer Name> ? Name : never]?: number;
+      } & {
+        [P in V extends OptionalBoolean<infer Name> ? Name : never]?: boolean;
+      }
+    : never;
+
+export type InferQueryParams<Q extends QueryParamsSchema = readonly never[]> =
+  Q extends readonly (infer V)[]
+    ? {
+        [P in V extends RequiredString<infer Name> ? Name : never]: string;
+      } & {
+        [P in V extends RequiredNumber<infer Name> ? Name : never]: number;
+      } & {
+        [P in V extends RequiredBoolean<infer Name> ? Name : never]: boolean;
+      } & {
+        [P in V extends OptionalString<infer Name> ? Name : never]?: string;
+      } & {
+        [P in V extends OptionalNumber<infer Name> ? Name : never]?: number;
+      } & {
+        [P in V extends OptionalBoolean<infer Name> ? Name : never]?: boolean;
+      } & {
+        [P in V extends RequiredStringArray<infer Name>
+          ? Name
+          : never]: readonly string[];
+      } & {
+        [P in V extends RequiredNumberArray<infer Name>
+          ? Name
+          : never]: readonly number[];
+      } & {
+        [P in V extends RequiredBooleanArray<infer Name>
+          ? Name
+          : never]: readonly boolean[];
+      } & {
+        [P in V extends OptionalStringArray<infer Name>
+          ? Name
+          : never]?: readonly string[];
+      } & {
+        [P in V extends OptionalNumberArray<infer Name>
+          ? Name
+          : never]?: readonly number[];
+      } & {
+        [P in V extends OptionalBooleanArray<infer Name>
+          ? Name
+          : never]?: readonly boolean[];
+      }
+    : never;

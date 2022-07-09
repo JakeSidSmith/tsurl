@@ -33,7 +33,7 @@ If you've ever used `react-router` this should be a great example of how TSURL c
 Let's define a TSURL for our user details page. This would be something like `/users/id/` where `id` is the user's ID. `react-router` uses `path-to-regexp` behind the scenes and so would require a path with the syntax `/users/:id/`, but TSURL can handle this for you.
 
 ```ts
-import createTSURL, { requiredString } from '@jakesidsmith/tsurl';
+import { createTSURL, requiredString } from '@jakesidsmith/tsurl';
 
 export const userDetailURL = createTSURL(['/users', requiredString('id')], {
   trailingSlash: true,
@@ -109,7 +109,7 @@ interface Result {
 
 ### createTSURL
 
-The `createTSURL` function, which is the default export, will construct a TSURL instance.
+The `createTSURL` function, which is also the default export, will construct a TSURL instance.
 
 This takes 1 or 2 arguments:
 
@@ -181,18 +181,56 @@ There are a lot of functions that you can use to define parameters.
 
 The URL schema supports the following:
 
-* `requiredString`
-* `requiredNumber`
-* `requiredBoolean`
-* `optionalString`
-* `optionalNumber`
-* `optionalBoolean`
+- `requiredString`
+- `requiredNumber`
+- `requiredBoolean`
+- `optionalString`
+- `optionalNumber`
+- `optionalBoolean`
 
 In addition to the ones listed above, the query params schema also supports the following:
 
-* `requiredStringArray`
-* `requiredNumberArray`
-* `requiredBooleanArray`
-* `optionalStringArray`
-* `optionalNumberArray`
-* `optionalBooleanArray`
+- `requiredStringArray`
+- `requiredNumberArray`
+- `requiredBooleanArray`
+- `optionalStringArray`
+- `optionalNumberArray`
+- `optionalBooleanArray`
+
+## Contributing
+
+### Setup
+
+Ensure you are using a compatible version of NodeJS (16) and NPM (8).
+
+If you're using NVM you can simply:
+
+```shell
+nvm use
+```
+
+And ensure you have NPM 8 installed globally:
+
+```shell
+npm i npm@8 -g
+```
+
+Then run a clean install to get fresh dependencies:
+
+```shell
+npm ci
+```
+
+### Scripts
+
+Run type-checking, linting and tests with:
+
+```shell
+npm test
+```
+
+You can fix formatting issues by running:
+
+```shell
+npm run prettier
+```

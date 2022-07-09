@@ -10,13 +10,28 @@ describe('TSURL', () => {
   it('should have some default options', () => {
     const instance = new TSURL([]);
 
-    // tslint:disable-next-line:no-string-literal
     expect(instance['options']).toEqual({
       encode: true,
       decode: true,
       normalize: true,
       queryArrayFormatSeparator: ',',
+      queryParams: [],
     });
+  });
+
+  it('should throw if required url params are not provided', () => {
+    const url1 = new TSURL(
+      [
+        '/api/test/',
+        requiredString('required'),
+        optionalString('optional'),
+        '///end',
+      ],
+      { trailingSlash: true }
+    );
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    expect(() => url1.construct({} as any, {})).toThrow('not provided');
   });
 
   describe('construct', () => {
@@ -31,6 +46,7 @@ describe('TSURL', () => {
         { trailingSlash: true }
       );
 
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       expect(() => url1.construct({} as any, {})).toThrow('not provided');
     });
 

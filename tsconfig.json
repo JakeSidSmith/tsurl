@@ -8,6 +8,7 @@
     "noUnusedParameters": true,
     "resolveJsonModule": true,
     "esModuleInterop": true,
+    "noUncheckedIndexedAccess": true,
     "moduleResolution": "node",
     "jsx": "react",
     "target": "es6",

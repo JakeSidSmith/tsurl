@@ -1,0 +1,78 @@
+{
+  "extends": [
+    "eslint:recommended",
+    "plugin:prettier/recommended",
+    "plugin:@typescript-eslint/eslint-recommended",
+    "plugin:@typescript-eslint/recommended"
+  ],
+  "plugins": ["prettier"],
+  "env": {
+    "es6": true,
+    "commonjs": true,
+    "node": true
+  },
+  "parser": "@typescript-eslint/parser",
+  "parserOptions": {
+    "sourceType": "module",
+    "ecmaVersion": 9
+  },
+  "rules": {
+    "strict": [2, "global"],
+    "no-duplicate-imports": [2, { "includeExports": true }],
+
+    "eqeqeq": 2,
+    "block-scoped-var": 2,
+    "no-constant-condition": 2,
+    "no-console": 2,
+    "no-debugger": 2,
+    "no-lonely-if": 2,
+    "no-lone-blocks": 2,
+    "no-nested-ternary": 2,
+    "no-dupe-keys": 2,
+    "no-extra-boolean-cast": 2,
+    "no-irregular-whitespace": 2,
+    "no-else-return": 2,
+    "no-eval": 2,
+    "no-multi-str": 2,
+    "no-self-compare": 2,
+    "no-useless-call": 2,
+    "no-shadow-restricted-names": 2,
+    "no-shadow": 2,
+    "no-undef": 2,
+    "no-undef-init": 2,
+    "no-unreachable": 2,
+    "no-unused-vars": 0,
+    "no-use-before-define": 2,
+
+    "radix": 2,
+    "curly": 2,
+    "no-fallthrough": 2,
+    "default-case": 2,
+
+    "no-var": 2,
+    "no-unused-expressions": 2,
+    "camelcase": [
+      2,
+      {
+        "properties": "always",
+        "allow": ["^UNSAFE_"]
+      }
+    ],
+    "@typescript-eslint/no-explicit-any": 2,
+    "@typescript-eslint/explicit-function-return-type": 0,
+    "@typescript-eslint/member-delimiter-style": 0,
+    "@typescript-eslint/type-annotation-spacing": 0,
+    "@typescript-eslint/no-unused-vars": 2,
+    "@typescript-eslint/no-use-before-define": 2
+  },
+  "overrides": [
+    {
+      "files": ["*.ts", "*.tsx"],
+      "rules": {
+        "no-use-before-define": 0,
+        "no-shadow": 0,
+        "no-undef": 0
+      }
+    }
+  ]
+}

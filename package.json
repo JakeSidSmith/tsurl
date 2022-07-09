@@ -1,18 +1,18 @@
 {
   "name": "@jakesidsmith/tsurl",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "Type safe URL construction and deconstruction",
   "main": "dist/index.js",
   "scripts": {
     "dist": "rm -rf dist && tsc --project tsconfig.dist.json",
     "prettier": "prettier --write '**/*.{ts,tsx,js,jsx,json}'",
     "prettier-check": "prettier --check '**/*.{ts,tsx,js,jsx,json}'",
-    "lint-js": "tslint --project tsconfig.json",
-    "typecheck": "tsc --project tsconfig.json --noEmit",
+    "lint-js": "eslint '**/*.{ts,tsx,js,jsx}'",
+    "typecheck": "tsc --project tsconfig.json --noEmit && tsassert",
     "lint": "npm run prettier-check && npm run typecheck && npm run lint-js",
     "tests": "jest",
-    "test": "npm run lint && npm run tests -- --coverage --runInBand",
-    "prepublishOnly": "npm test && npm run dist"
+    "test": "npm run lint && npm run tests -- --coverage --runInBand && npm run dist",
+    "prepublishOnly": "npm test"
   },
   "repository": {
     "type": "git",
@@ -45,17 +45,20 @@
     "encodeurl": "^1.0.2",
     "path-to-regexp": "^6.1.0",
     "query-string": "^6.11.1",
-    "typescript": "^3.8.2",
     "url-parse": "^1.4.7"
   },
   "devDependencies": {
-    "@types/jest": "^25.1.3",
-    "jest": "^25.1.0",
-    "prettier": "^1.19.1",
-    "ts-jest": "^25.2.1",
-    "tslint": "^5.20.1",
-    "tslint-config-prettier": "^1.18.0",
-    "tslint-eslint-rules": "^5.4.0"
+    "@jakesidsmith/tsassert": "^0.3.2",
+    "@types/jest": "^28.1.4",
+    "@typescript-eslint/eslint-plugin": "^5.30.5",
+    "@typescript-eslint/parser": "^5.30.5",
+    "eslint": "^8.19.0",
+    "eslint-config-prettier": "^8.5.0",
+    "eslint-plugin-prettier": "^4.2.1",
+    "jest": "^28.1.2",
+    "prettier": "^2.7.1",
+    "ts-jest": "^28.0.5",
+    "typescript": "^4.7.4"
   },
   "peerDependencies": {
     "typescript": ">=3.7"

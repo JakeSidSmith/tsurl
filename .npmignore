@@ -18,3 +18,4 @@ npm-debug.log*
 /tsconfig.dist.json
 /tsconfig.json
 /tslint.json
+/.eslintrc.json

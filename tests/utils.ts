@@ -29,9 +29,11 @@ describe('serializeValue', () => {
       'Invalid value for'
     );
     expect(() =>
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       serializeValue(optionalStringArray('test'), null as any)
     ).toThrow('Invalid value for');
     expect(() =>
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       serializeValue(optionalNumberArray('test'), null as any)
     ).toThrow('Invalid value for');
     expect(() =>
@@ -41,6 +43,7 @@ describe('serializeValue', () => {
       serializeValue(optionalBooleanArray('test'), ['nope'])
     ).toThrow('Invalid value for');
     expect(() =>
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       serializeValue(optionalBooleanArray('test'), null as any)
     ).toThrow('Invalid value for');
   });

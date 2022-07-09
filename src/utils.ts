@@ -6,39 +6,49 @@ import {
   MATCHES_MAYBE_TRAILING_SLASH,
   MATCHES_MULTIPLE_SLASHES,
 } from './constants';
-import * as SYMBOLS from './symbols';
+import {
+  OptionalBoolean,
+  OptionalBooleanArray,
+  OptionalNumber,
+  OptionalNumberArray,
+  OptionalString,
+  OptionalStringArray,
+  RequiredBoolean,
+  RequiredBooleanArray,
+  RequiredNumber,
+  RequiredNumberArray,
+  RequiredString,
+  RequiredStringArray,
+} from './params';
 import {
   AnyPart,
+  InferQueryParams,
+  InferURLParams,
   QueryParamsSchema,
-  RequiredPart,
   TSURLOptions,
   URLParamsSchema,
 } from './types';
 
-export const isRequired = <T extends string>(
-  part: AnyPart<string>
-): part is RequiredPart<T> => SYMBOLS.REQUIRED.indexOf(part.type) >= 0;
-
-export const serializeValue = (
-  part: AnyPart<string>,
+export const serializeValue = <T extends string>(
+  part: AnyPart<T>,
   value: string | undefined | ReadonlyArray<string>
 ) => {
-  if (part.type === SYMBOLS.REQUIRED_STRING && typeof value === 'string') {
+  if (part instanceof RequiredString && typeof value === 'string') {
     return value;
   }
 
   if (
-    part.type === SYMBOLS.OPTIONAL_STRING &&
+    part instanceof OptionalString &&
     (typeof value === 'string' || typeof value === 'undefined')
   ) {
     return value;
   }
 
-  if (part.type === SYMBOLS.REQUIRED_NUMBER && typeof value === 'string') {
+  if (part instanceof RequiredNumber && typeof value === 'string') {
     return parseFloat(value);
   }
 
-  if (part.type === SYMBOLS.OPTIONAL_NUMBER) {
+  if (part instanceof OptionalNumber) {
     if (typeof value === 'string') {
       return parseFloat(value);
     }
@@ -48,7 +58,7 @@ export const serializeValue = (
     }
   }
 
-  if (part.type === SYMBOLS.REQUIRED_BOOLEAN && typeof value === 'string') {
+  if (part instanceof RequiredBoolean && typeof value === 'string') {
     if (value === 'true') {
       return true;
     }
@@ -58,7 +68,7 @@ export const serializeValue = (
     }
   }
 
-  if (part.type === SYMBOLS.OPTIONAL_BOOLEAN) {
+  if (part instanceof OptionalBoolean) {
     if (value === 'true') {
       return true;
     }
@@ -73,15 +83,15 @@ export const serializeValue = (
   }
 
   if (
-    part.type === SYMBOLS.REQUIRED_STRING_ARRAY &&
+    part instanceof RequiredStringArray &&
     (typeof value === 'string' || Array.isArray(value))
   ) {
-    return ([] as ReadonlyArray<string>).concat(value);
+    return ([] as readonly string[]).concat(value);
   }
 
-  if (part.type === SYMBOLS.OPTIONAL_STRING_ARRAY) {
+  if (part instanceof OptionalStringArray) {
     if (typeof value === 'string' || Array.isArray(value)) {
-      return ([] as ReadonlyArray<string>).concat(value);
+      return ([] as readonly string[]).concat(value);
     }
 
     if (typeof value === 'undefined') {
@@ -90,19 +100,19 @@ export const serializeValue = (
   }
 
   if (
-    part.type === SYMBOLS.REQUIRED_NUMBER_ARRAY &&
+    part instanceof RequiredNumberArray &&
     (typeof value === 'string' || Array.isArray(value))
   ) {
-    return ([] as ReadonlyArray<string>)
+    return ([] as readonly string[])
       .concat(value)
-      .map(sub => parseFloat(sub));
+      .map((sub) => parseFloat(sub));
   }
 
-  if (part.type === SYMBOLS.OPTIONAL_NUMBER_ARRAY) {
+  if (part instanceof OptionalNumberArray) {
     if (typeof value === 'string' || Array.isArray(value)) {
-      return ([] as ReadonlyArray<string>)
+      return ([] as readonly string[])
         .concat(value)
-        .map(sub => parseFloat(sub));
+        .map((sub) => parseFloat(sub));
     }
 
     if (typeof value === 'undefined') {
@@ -111,10 +121,10 @@ export const serializeValue = (
   }
 
   if (
-    part.type === SYMBOLS.REQUIRED_BOOLEAN_ARRAY &&
+    part instanceof RequiredBooleanArray &&
     (typeof value === 'string' || Array.isArray(value))
   ) {
-    return ([] as ReadonlyArray<string>).concat(value).map(sub => {
+    return ([] as readonly string[]).concat(value).map((sub) => {
       if (sub === 'true') {
         return true;
       }
@@ -127,9 +137,9 @@ export const serializeValue = (
     });
   }
 
-  if (part.type === SYMBOLS.OPTIONAL_BOOLEAN_ARRAY) {
+  if (part instanceof OptionalBooleanArray) {
     if (typeof value === 'string' || Array.isArray(value)) {
-      return ([] as ReadonlyArray<string>).concat(value).map(sub => {
+      return ([] as readonly string[]).concat(value).map((sub) => {
         if (sub === 'true') {
           return true;
         }
@@ -151,35 +161,27 @@ export const serializeValue = (
 };
 
 export const serializeURLParams = <
-  RequiredStringURLKeys extends string = never,
-  RequiredNumberURLKeys extends string = never,
-  RequiredBooleanURLKeys extends string = never,
-  OptionalStringURLKeys extends string = never,
-  OptionalNumberURLKeys extends string = never,
-  OptionalBooleanURLKeys extends string = never
+  S extends URLParamsSchema = readonly never[]
 >(
   params: Record<string, string | undefined | null | ReadonlyArray<string>>,
-  schema: URLParamsSchema<
-    RequiredStringURLKeys,
-    RequiredNumberURLKeys,
-    RequiredBooleanURLKeys,
-    OptionalStringURLKeys,
-    OptionalNumberURLKeys,
-    OptionalBooleanURLKeys
-  >
+  schema: S
 ) => {
-  const serializedParams = {} as Record<RequiredStringURLKeys, string> &
-    Record<RequiredNumberURLKeys, number> &
-    Record<RequiredBooleanURLKeys, boolean> &
-    Partial<Record<OptionalStringURLKeys, string>> &
-    Partial<Record<OptionalNumberURLKeys, number>> &
-    Partial<Record<OptionalBooleanURLKeys, boolean>>;
+  const serializedParams: Record<
+    string,
+    | undefined
+    | string
+    | number
+    | boolean
+    | readonly string[]
+    | readonly number[]
+    | readonly boolean[]
+  > = {};
 
-  schema.forEach(part => {
+  schema.forEach((part) => {
     if (typeof part !== 'string') {
       const value = params[part.name];
 
-      if (isRequired(part) && typeof value === 'undefined') {
+      if (part.required && typeof value === 'undefined') {
         throw new Error(`Required URL param "${part.name}" was undefined`);
       }
 
@@ -187,74 +189,34 @@ export const serializeURLParams = <
         throw new Error(`Invalid null value for URL param "${part.name}"`);
       }
 
-      serializedParams[part.name] = serializeValue(part, value) as (Record<
-        RequiredStringURLKeys,
-        string
-      > &
-        Record<RequiredNumberURLKeys, number> &
-        Record<RequiredBooleanURLKeys, boolean> &
-        Partial<Record<OptionalStringURLKeys, string>> &
-        Partial<Record<OptionalNumberURLKeys, number>> &
-        Partial<Record<OptionalBooleanURLKeys, boolean>>)[
-        | RequiredStringURLKeys
-        | RequiredNumberURLKeys
-        | RequiredBooleanURLKeys
-        | OptionalStringURLKeys
-        | OptionalNumberURLKeys
-        | OptionalBooleanURLKeys];
+      serializedParams[part.name] = serializeValue(part, value);
     }
   });
 
-  return serializedParams;
+  return serializedParams as InferURLParams<S>;
 };
 
 export const serializeQueryParams = <
-  RequiredStringQueryKeys extends string = never,
-  RequiredNumberQueryKeys extends string = never,
-  RequiredBooleanQueryKeys extends string = never,
-  RequiredStringArrayQueryKeys extends string = never,
-  RequiredNumberArrayQueryKeys extends string = never,
-  RequiredBooleanArrayQueryKeys extends string = never,
-  OptionalStringQueryKeys extends string = never,
-  OptionalNumberQueryKeys extends string = never,
-  OptionalBooleanQueryKeys extends string = never,
-  OptionalStringArrayQueryKeys extends string = never,
-  OptionalNumberArrayQueryKeys extends string = never,
-  OptionalBooleanArrayQueryKeys extends string = never
+  Q extends QueryParamsSchema = readonly never[]
 >(
   params: Record<string, string | undefined | null | ReadonlyArray<string>>,
-  schema: QueryParamsSchema<
-    RequiredStringQueryKeys,
-    RequiredNumberQueryKeys,
-    RequiredBooleanQueryKeys,
-    RequiredStringArrayQueryKeys,
-    RequiredNumberArrayQueryKeys,
-    RequiredBooleanArrayQueryKeys,
-    OptionalStringQueryKeys,
-    OptionalNumberQueryKeys,
-    OptionalBooleanQueryKeys,
-    OptionalStringArrayQueryKeys,
-    OptionalNumberArrayQueryKeys,
-    OptionalBooleanArrayQueryKeys
-  >
+  schema: Q
 ) => {
-  const serializedParams = {} as Record<RequiredStringQueryKeys, string> &
-    Record<RequiredNumberQueryKeys, number> &
-    Record<RequiredBooleanQueryKeys, boolean> &
-    Record<RequiredStringArrayQueryKeys, string> &
-    Record<RequiredNumberArrayQueryKeys, number> &
-    Record<RequiredBooleanArrayQueryKeys, boolean> &
-    Partial<Record<OptionalStringQueryKeys, string>> &
-    Partial<Record<OptionalNumberQueryKeys, number>> &
-    Partial<Record<OptionalBooleanQueryKeys, boolean>> &
-    Partial<Record<OptionalStringArrayQueryKeys, string>> &
-    Partial<Record<OptionalNumberArrayQueryKeys, number>> &
-    Partial<Record<OptionalBooleanArrayQueryKeys, boolean>>;
+  const serializedParams: Record<
+    string,
+    | undefined
+    | string
+    | number
+    | boolean
+    | readonly string[]
+    | readonly number[]
+    | readonly boolean[]
+  > = {};
 
-  schema.forEach(part => {
+  schema.forEach((part) => {
     const value = params[part.name];
 
-    if (isRequired(part) && typeof value === 'undefined') {
+    if (part.required && typeof value === 'undefined') {
       throw new Error(`Required query param "${part.name}" was undefined`);
     }
 
@@ -262,67 +224,21 @@ export const serializeQueryParams = <
       throw new Error(`Invalid null value for URL param "${part.name}"`);
     }
 
-    serializedParams[part.name] = serializeValue(part, value) as (Record<
-      RequiredStringQueryKeys,
-      string
-    > &
-      Record<RequiredNumberQueryKeys, number> &
-      Record<RequiredBooleanQueryKeys, boolean> &
-      Record<RequiredStringArrayQueryKeys, string> &
-      Record<RequiredNumberArrayQueryKeys, number> &
-      Record<RequiredBooleanArrayQueryKeys, boolean> &
-      Partial<Record<OptionalStringQueryKeys, string>> &
-      Partial<Record<OptionalNumberQueryKeys, number>> &
-      Partial<Record<OptionalBooleanQueryKeys, boolean>> &
-      Partial<Record<OptionalStringArrayQueryKeys, string>> &
-      Partial<Record<OptionalNumberArrayQueryKeys, number>> &
-      Partial<Record<OptionalBooleanArrayQueryKeys, boolean>>)[
-      | RequiredStringQueryKeys
-      | RequiredNumberQueryKeys
-      | RequiredBooleanQueryKeys
-      | RequiredStringArrayQueryKeys
-      | RequiredNumberArrayQueryKeys
-      | RequiredBooleanArrayQueryKeys
-      | OptionalStringQueryKeys
-      | OptionalNumberQueryKeys
-      | OptionalBooleanQueryKeys
-      | OptionalStringArrayQueryKeys
-      | OptionalNumberArrayQueryKeys
-      | OptionalBooleanArrayQueryKeys];
+    serializedParams[part.name] = serializeValue(part, value);
   });
 
-  return serializedParams;
+  return serializedParams as InferQueryParams<Q>;
 };
 
-export const constructPath = (
-  urlParams: Record<string, undefined | string | number | boolean>,
-  urlParamsSchema: URLParamsSchema<
-    string,
-    string,
-    string,
-    string,
-    string,
-    string
-  >,
-  options: TSURLOptions<
-    string,
-    string,
-    string,
-    string,
-    string,
-    string,
-    string,
-    string,
-    string,
-    string,
-    string,
-    string
-  >
+export const constructPath = <S extends URLParamsSchema = readonly never[]>(
+  urlParams: Record<string, string | boolean | number>,
+  urlParamsSchema: S,
+  options: Omit<TSURLOptions<readonly never[]>, 'queryParams'>
 ) => {
   const { trailingSlash, protocol, encode, normalize } = options;
 
   let url = urlParamsSchema
-    .map<string>(part => {
+    .map<string>((part) => {
       if (typeof part === 'string') {
         return part;
       }
@@ -330,14 +246,14 @@ export const constructPath = (
       const value = urlParams[part.name];
 
       if (typeof value === 'undefined') {
-        if (isRequired(part)) {
+        if (part.required) {
           throw new Error(`Required URL param "${part.name}" was not provided`);
         }
 
         return '';
       }
 
-      return `${value}`;
+      return value.toString();
     })
     .join('/');
 
@@ -368,56 +284,29 @@ export const constructPath = (
   return url;
 };
 
-export const constructQuery = (
+export const constructQuery = <Q extends QueryParamsSchema = readonly never[]>(
   queryParams: Record<
     string,
-    | undefined
     | string
-    | number
     | boolean
-    | ReadonlyArray<string>
-    | ReadonlyArray<number>
-    | ReadonlyArray<boolean>
+    | number
+    | readonly string[]
+    | readonly boolean[]
+    | readonly number[]
   >,
-  queryParamsShema: QueryParamsSchema<
-    string,
-    string,
-    string,
-    string,
-    string,
-    string,
-    string,
-    string,
-    string,
-    string,
-    string,
-    string
-  >,
-  options: TSURLOptions<
-    string,
-    string,
-    string,
-    string,
-    string,
-    string,
-    string,
-    string,
-    string,
-    string,
-    string,
-    string
-  >
+  queryParamsShema: Q,
+  options: TSURLOptions<Q>
 ) => {
   const { encode, queryArrayFormat, queryArrayFormatSeparator } = options;
 
-  const filteredQueryParams: typeof queryParams = {};
+  const filteredQueryParams: Record<string, unknown> = {};
 
-  queryParamsShema.forEach(part => {
+  queryParamsShema.forEach((part) => {
     const value = queryParams[part.name];
 
     if (typeof value !== 'undefined') {
       filteredQueryParams[part.name] = value;
-    } else if (isRequired(part)) {
+    } else if (part.required) {
       throw new Error(`Required query param "${part.name}" was not provided`);
     }
   });
