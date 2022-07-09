@@ -22,11 +22,17 @@ export class TSURL<
   S extends URLParamsSchema = readonly never[],
   Q extends QueryParamsSchema = readonly never[]
 > {
-  private options: TSURLOptions<Q>;
+  private options: TSURLOptions<Q> &
+    Required<Pick<TSURLOptions<Q>, 'queryParams'>>;
   private schema: S;
 
   public constructor(schema: S, options?: TSURLOptions<Q>) {
-    this.options = { ...DEFAULT_OPTIONS, ...options };
+    this.options = {
+      ...DEFAULT_OPTIONS,
+      ...options,
+      // We cast a default queryParams so that the output type of deconstruct doesn't have to handle it potentially being undefined
+      queryParams: options?.queryParams ?? ([] as unknown as Q),
+    };
     this.schema = schema;
   }
 
@@ -73,10 +79,7 @@ export class TSURL<
 
     return {
       urlParams: serializeURLParams(urlMatch.params, this.schema),
-      queryParams: serializeQueryParams(
-        queryParams,
-        this.options.queryParams ?? []
-      ),
+      queryParams: serializeQueryParams(queryParams, this.options.queryParams),
     };
   };
 
