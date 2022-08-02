@@ -8,7 +8,7 @@
 
 Until now you've probably been relying on keeping various bits of code in sync, or casting types `as` whatever you believe they should be to prevent errors when constructing, matching and or deconstructing URLs.
 
-TSURL prevents the need for you to worry about keeping your path templates in sync with your URL parameters, worries about accidental `//` in paths, missing URL parameters, bad protocols, unintentional or missing trailing slashes, URL encoding and decoding, query parameter construction/deconstruction, and type casting.
+TSURL prevents the need for you to worry about keeping your path templates in sync with your URL parameters, worries about accidental `//` in paths, missing URL parameters, unintentional or missing trailing slashes, URL encoding and decoding, query parameter construction/deconstruction, and type casting.
 
 Built on top of existing libraries that you're probably already using, such as `path-to-regexp`, `encodeurl` `query-string`, `url-parse`, etc, TSURL combines their functionality to provide a type safe interface for working with URLs and paths.
 
@@ -48,7 +48,7 @@ import { userDetailURL } from './urls';
 
 // ...
 
-<Route path={userDetailURL.getURLTemplate()} component={UserDetailPage} />;
+<Route path={userDetailURL.getPathTemplate()} component={UserDetailPage} />;
 ```
 
 This outputs a path with the same syntax as required by `react-router`.
@@ -105,6 +105,41 @@ interface Result {
 }
 ```
 
+## Example with `baseURL`
+
+If all of your requests are prefixed with a specific domain and or path you can provide a `baseURL` as an option which may include protocol, host, port, and base path.
+
+Note: the `baseURL` is not affected by the `normalize` option, except where a base URL with a trailing slash and a path with a leading slash would cause an unwanted double slash e.g. `baseURL: https://domain.com/api/` and path `/users` would output `https://domain.com/api/users` instead of `https://domain.com/api//users`.
+
+Example base URLs:
+
+```txt
+'domain.com'
+'https://domain.com'
+'http://localhost:1234'
+'/api/'
+'domain.com/api/'
+'https://domain.com/api'
+'http://localhost:1234/api'
+```
+
+Example output:
+
+```tsx
+const url = createTSURL(['/users', requiredString('userId')], {
+  baseURL: 'https://domain.com/api/'
+});
+
+url.getURLTemplate();
+// https://domain.com/api/users/:userId
+url.getPathTemplate();
+// /api/users/:userId
+url.constructURL({userId: 'ac'}, {});
+// https://domain.com/api/users/abc
+url.constructPath();
+// /api/users/abc
+```
+
 ## API
 
 ### createTSURL
@@ -120,17 +155,44 @@ Returns `TSURL` with inferred keys for URL and query params.
 
 ### TSURL.getURLTemplate
 
-Returns a `path-to-regexp` compatible `string` from your defined schema.
+Returns a `path-to-regexp` compatible URL (including the `baseURL`) `string` from your defined schema.
 
 This method takes no arguments.
 
-### TSURL.construct
+### TSURL.getPathTemplate
 
-Returns a `string` URL/path.
+Returns a `path-to-regexp` compatible path (excluding the `baseURL`) `string` from your defined schema.
+
+This method takes no arguments.
+
+### TSURL.constructURL
+
+Returns a `string` URL (including the `baseURL`).
 
 This takes 2 arguments:
 
 - The URL params for this URL - an object with keys that match the required/optional URL params
+- The Query params for this URL - an object with keys that match the required/optional query params
+
+Note: this method will throw an error if you have not supplied required url/query params somehow (e.g. if you are not using type checking because your app is written in JavaScript, or you have cast your params to `any` in TypeScript).
+
+### TSURL.constructPath
+
+Returns a `string` path (excluding the `baseURL`).
+
+This takes 2 arguments:
+
+- The URL params for this URL - an object with keys that match the required/optional URL params
+- The Query params for this URL - an object with keys that match the required/optional query params
+
+Note: this method will throw an error if you have not supplied required url/query params somehow (e.g. if you are not using type checking because your app is written in JavaScript, or you have cast your params to `any` in TypeScript).
+
+### TSURL.constructQuery
+
+Returns a `string` of query params (prefixed with `?`) if any are provided.
+
+This takes 1 argument:
+
 - The Query params for this URL - an object with keys that match the required/optional query params
 
 Note: this method will throw an error if you have not supplied required query params somehow (e.g. if you are not using type checking because your app is written in JavaScript, or you have cast your params to `any` in TypeScript).
@@ -166,11 +228,11 @@ The options object is the second argument to the `createTSURL` function. All ava
 
 Options include:
 
-- `protocol` - `string | false` - protocol to enforce, or remove if set to `false`. Does nothing by default.
+- `baseURL` - `string` - base URL to prefix constructed URLs with (can include protocol, host, port, and base path e.g. `https://domain.com/api`).
 - `trailingSlash` - `boolean` - enforce or remove trailing slashes. Does nothing by default.
 - `encode` - `boolean` - whether to encode the URL when constructing. Defaults to `true`.
 - `decode` - `boolean` - whether to decode the URL when deconstructing. Default to `true`.
-- `normalize` - `boolean` - whether to strip **all** double slashes (`//`, including those that may be part of a protocol). Defaults to `true`. You should define an explicit `protocol` to avoid `//` being stripped from the protocol if your URL contains one.
+- `normalize` - `boolean` - whether to strip **all** double slashes from the path (`//`, excluding the `baseURL`, except where this causes multiple trailing slashes e.g. `createTSURL` with `baseURL: 'https://domain.com/api/'` and path parts `['/users']` will construct `https://domain.com/api/users`). Defaults to `true`.
 - `queryArrayFormat` - how to handle constructing/deconstructing query params that can have multiple values. This option is defined by the `query-string` package.
 - `queryArrayFormatSeparator` - `string` - the separator to use when `queryArrayFormat` is set to `separator`. Defaults to `,`.
 - `queryParams` - an array of [parameters](#parameters).

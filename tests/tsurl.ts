@@ -31,10 +31,13 @@ describe('TSURL', () => {
     );
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    expect(() => url1.construct({} as any, {})).toThrow('not provided');
+    expect(() => url1.constructPath({} as any, {})).toThrow('not provided');
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    expect(() => url1.constructURL({} as any, {})).toThrow('not provided');
   });
 
-  describe('construct', () => {
+  describe('constructPath', () => {
     it('should throw if required url params are not provided', () => {
       const url1 = createTSURL(
         [
@@ -47,7 +50,7 @@ describe('TSURL', () => {
       );
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      expect(() => url1.construct({} as any, {})).toThrow('not provided');
+      expect(() => url1.constructPath({} as any, {})).toThrow('not provided');
     });
 
     it('should not append query params if none are found', () => {
@@ -56,7 +59,7 @@ describe('TSURL', () => {
         { trailingSlash: true, queryParams: [optionalString('nope')] }
       );
 
-      expect(url1.construct({ required: 'required' }, {})).toBe(
+      expect(url1.constructPath({ required: 'required' }, {})).toBe(
         '/api/test/required/end/'
       );
     });
@@ -72,7 +75,7 @@ describe('TSURL', () => {
         { normalize: false }
       );
 
-      expect(url1.construct({ required: 'value' }, {})).toBe(
+      expect(url1.constructPath({ required: 'value' }, {})).toBe(
         '/api/test//value///end'
       );
     });
@@ -88,7 +91,7 @@ describe('TSURL', () => {
         { trailingSlash: true }
       );
 
-      expect(url1.construct({ required: 'value' }, {})).toBe(
+      expect(url1.constructPath({ required: 'value' }, {})).toBe(
         '/api/test/value/end/'
       );
     });
@@ -104,9 +107,9 @@ describe('TSURL', () => {
         { trailingSlash: false }
       );
 
-      expect(noSlash.construct({ required: 'value', optional: 123 }, {})).toBe(
-        'api/test/value/123/end'
-      );
+      expect(
+        noSlash.constructPath({ required: 'value', optional: 123 }, {})
+      ).toBe('api/test/value/123/end');
     });
 
     it('should construct a string with unchanged trailing slash when no trailing slash option is provided', () => {
@@ -117,9 +120,9 @@ describe('TSURL', () => {
         '///end',
       ]);
 
-      expect(noSlash.construct({ required: 'value', optional: 123 }, {})).toBe(
-        'api/test/value/123/end'
-      );
+      expect(
+        noSlash.constructPath({ required: 'value', optional: 123 }, {})
+      ).toBe('api/test/value/123/end');
 
       const withSlash = createTSURL([
         'api//test/',
@@ -129,62 +132,22 @@ describe('TSURL', () => {
       ]);
 
       expect(
-        withSlash.construct({ required: 'value', optional: 123 }, {})
+        withSlash.constructPath({ required: 'value', optional: 123 }, {})
       ).toBe('api/test/value/123/end/');
     });
 
-    it('should remove leading double slashes when no protocol option is defined', () => {
-      const noProtocol = createTSURL(['//api//test/']);
+    it('should remove leading double slashes when no baseURL option is defined', () => {
+      const noBaseURL = createTSURL(['//api//test/']);
 
-      expect(noProtocol.construct({}, {})).toBe('/api/test/');
-    });
-
-    it('should replace the protocol when protocol option is provided', () => {
-      const url1 = createTSURL(['//test.com/api//test/'], {
-        protocol: 'https://',
-      });
-
-      expect(url1.construct({}, {})).toBe('https://test.com/api/test/');
-
-      const url2 = createTSURL(['http://test.com/api//test/'], {
-        protocol: 'https://',
-      });
-
-      expect(url2.construct({}, {})).toBe('https://test.com/api/test/');
-
-      const url3 = createTSURL(['dns:test.com/api//test/'], {
-        protocol: 'https://',
-      });
-
-      expect(url3.construct({}, {})).toBe('https://test.com/api/test/');
-
-      const url4 = createTSURL(['////////test.com/api//test/'], {
-        protocol: '//',
-      });
-
-      expect(url4.construct({}, {})).toBe('//test.com/api/test/');
-    });
-
-    it('should add a protocol when protocol option is provided', () => {
-      const url1 = createTSURL(['test.com/api//test/'], {
-        protocol: 'https://',
-      });
-
-      expect(url1.construct({}, {})).toBe('https://test.com/api/test/');
-    });
-
-    it('should remove the protocol when protocol option is false', () => {
-      const url1 = createTSURL(['https://test.com/api//test/'], {
-        protocol: false,
-      });
-
-      expect(url1.construct({}, {})).toBe('test.com/api/test/');
+      expect(noBaseURL.constructPath({}, {})).toBe('/api/test/');
     });
 
     it('should encode the url by default', () => {
       const url1 = createTSURL(['test.com/api//test/hello world']);
 
-      expect(url1.construct({}, {})).toBe('test.com/api/test/hello%20world');
+      expect(url1.constructPath({}, {})).toBe(
+        'test.com/api/test/hello%20world'
+      );
     });
 
     it('should not encode the url when the encode option is false', () => {
@@ -192,7 +155,74 @@ describe('TSURL', () => {
         encode: false,
       });
 
-      expect(url1.construct({}, {})).toBe('test.com/api/test/hello world');
+      expect(url1.constructPath({}, {})).toBe('test.com/api/test/hello world');
+    });
+  });
+
+  describe('constructURL', () => {
+    it('should not remove leading double slashes when no baseURL option is defined and normalize is false', () => {
+      const noBaseURL = createTSURL(['//api//test/'], { normalize: false });
+
+      expect(noBaseURL.constructURL({}, {})).toBe('//api//test/');
+    });
+
+    it('should not remove leading double slashes when baseURL option is defined and normalize is false', () => {
+      const withBaseURL = createTSURL(['//api//test/'], {
+        baseURL: 'https://test.com/',
+        normalize: false,
+      });
+
+      expect(withBaseURL.constructURL({}, {})).toBe(
+        'https://test.com///api//test/'
+      );
+    });
+
+    it('should remove leading double slashes when no baseURL option is defined', () => {
+      const noBaseURL = createTSURL(['//api//test/']);
+
+      expect(noBaseURL.constructURL({}, {})).toBe('/api/test/');
+    });
+
+    it('should remove leading double slashes when baseURL option is defined', () => {
+      const withBaseURL = createTSURL(['//api//test/'], {
+        baseURL: 'https://test.com//',
+      });
+
+      expect(withBaseURL.constructURL({}, {})).toBe(
+        'https://test.com/api/test/'
+      );
+    });
+
+    it('should include the baseURL when that option is provided', () => {
+      const url1 = createTSURL(['//api//test/'], {
+        baseURL: 'https://test.com/',
+      });
+
+      expect(url1.constructURL({}, {})).toBe('https://test.com/api/test/');
+
+      const url2 = createTSURL(['////////api//test/'], {
+        baseURL: '//test.com/',
+      });
+
+      expect(url2.constructURL({}, {})).toBe('//test.com/api/test/');
+    });
+
+    it('should not include the baseURL when that option is not provided', () => {
+      const url1 = createTSURL(['//api//test/'], {});
+
+      expect(url1.constructURL({}, {})).toBe('/api/test/');
+    });
+
+    it('should include the query params when provided', () => {
+      const url = createTSURL(['//api//test/'], {
+        baseURL: 'https://test.com/',
+        queryParams: [optionalString('optional')],
+      });
+
+      expect(url.constructURL({}, {})).toBe('https://test.com/api/test/');
+      expect(url.constructURL({}, { optional: 'hello' })).toBe(
+        'https://test.com/api/test/?optional=hello'
+      );
     });
   });
 
@@ -205,7 +235,7 @@ describe('TSURL', () => {
         optionalString('optional'),
       ]);
 
-      const urlString1 = url1.construct({ required: 'value1' }, {});
+      const urlString1 = url1.constructPath({ required: 'value1' }, {});
 
       expect(url1.deconstruct(urlString1)).toEqual({
         urlParams: {
@@ -221,7 +251,7 @@ describe('TSURL', () => {
         optionalString('optional'),
       ]);
 
-      const urlString2 = url2.construct(
+      const urlString2 = url2.constructPath(
         { required: 'value1', optional: 'value2' },
         {}
       );
@@ -246,7 +276,7 @@ describe('TSURL', () => {
         }
       );
 
-      const urlString3 = url3.construct(
+      const urlString3 = url3.constructPath(
         { required: 'value1', optional: 'value2' },
         { required: 'value3' }
       );
@@ -273,7 +303,7 @@ describe('TSURL', () => {
         }
       );
 
-      const urlString4 = url4.construct(
+      const urlString4 = url4.constructPath(
         { required: 'value1', optional: 'value2' },
         { required: 'value3', optional: 'value4' }
       );
@@ -301,7 +331,7 @@ describe('TSURL', () => {
         }
       );
 
-      const urlString5 = url5.construct(
+      const urlString5 = url5.constructPath(
         { required: 1, optional: 2 },
         { required: 3, optional: 4 }
       );
@@ -365,6 +395,41 @@ describe('TSURL', () => {
     });
   });
 
+  describe('getPathTemplate', () => {
+    it('returns a string template representing the path with the path-to-regexp format', () => {
+      const url1 = createTSURL(
+        [
+          '/api//test/',
+          requiredString('required'),
+          'test',
+          optionalString('optional'),
+        ],
+        {
+          trailingSlash: true,
+        }
+      );
+
+      expect(url1.getPathTemplate()).toBe(
+        '/api/test/:required/test/:optional?/'
+      );
+
+      const url2 = createTSURL(
+        [
+          '//test/',
+          requiredString('required'),
+          'test',
+          optionalString('optional'),
+        ],
+        {
+          baseURL: 'https://test.com/api/',
+          trailingSlash: true,
+        }
+      );
+
+      expect(url2.getPathTemplate()).toBe('/test/:required/test/:optional?/');
+    });
+  });
+
   describe('getURLTemplate', () => {
     it('returns a string template representing the URL with the path-to-regexp format', () => {
       const url1 = createTSURL(
@@ -381,6 +446,23 @@ describe('TSURL', () => {
 
       expect(url1.getURLTemplate()).toBe(
         '/api/test/:required/test/:optional?/'
+      );
+
+      const url2 = createTSURL(
+        [
+          '//test/',
+          requiredString('required'),
+          'test',
+          optionalString('optional'),
+        ],
+        {
+          baseURL: 'https://test.com/api/',
+          trailingSlash: true,
+        }
+      );
+
+      expect(url2.getURLTemplate()).toBe(
+        'https://test.com/api/test/:required/test/:optional?/'
       );
     });
   });

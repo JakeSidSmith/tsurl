@@ -2,9 +2,10 @@ import encodeurl from 'encodeurl';
 import queryString from 'query-string';
 
 import {
-  MATCHES_MAYBE_PROTOCOL,
+  MATCHES_LEADING_SLASHES,
   MATCHES_MAYBE_TRAILING_SLASH,
   MATCHES_MULTIPLE_SLASHES,
+  MATCHES_TRAILING_SLASHES,
 } from './constants';
 import {
   OptionalBoolean,
@@ -235,9 +236,9 @@ export const constructPath = <S extends URLParamsSchema = readonly never[]>(
   urlParamsSchema: S,
   options: Omit<TSURLOptions<readonly never[]>, 'queryParams'>
 ) => {
-  const { trailingSlash, protocol, encode, normalize } = options;
+  const { trailingSlash, normalize } = options;
 
-  let url = urlParamsSchema
+  let path = urlParamsSchema
     .map<string>((part) => {
       if (typeof part === 'string') {
         return part;
@@ -258,23 +259,58 @@ export const constructPath = <S extends URLParamsSchema = readonly never[]>(
     .join('/');
 
   if (normalize === true) {
-    url = url.replace(MATCHES_MULTIPLE_SLASHES, '/');
+    path = path.replace(MATCHES_MULTIPLE_SLASHES, '/');
   }
 
   if (trailingSlash === true) {
-    url = url.replace(MATCHES_MAYBE_TRAILING_SLASH, '/');
+    path = path.replace(MATCHES_MAYBE_TRAILING_SLASH, '/');
   }
 
   if (trailingSlash === false) {
-    url = url.replace(MATCHES_MAYBE_TRAILING_SLASH, '');
+    path = path.replace(MATCHES_MAYBE_TRAILING_SLASH, '');
   }
 
-  if (typeof protocol === 'string') {
-    url = url.replace(MATCHES_MAYBE_PROTOCOL, protocol);
+  return path;
+};
+
+export const constructPathAndMaybeEncode = <
+  S extends URLParamsSchema = readonly never[]
+>(
+  urlParams: Record<string, string | boolean | number>,
+  urlParamsSchema: S,
+  options: Omit<TSURLOptions<readonly never[]>, 'queryParams'>
+) => {
+  const { encode } = options;
+
+  let path = constructPath(urlParams, urlParamsSchema, options);
+
+  if (encode === true) {
+    path = encodeurl(path);
   }
 
-  if (protocol === false) {
-    url = url.replace(MATCHES_MAYBE_PROTOCOL, '');
+  return path;
+};
+
+export const constructURLAndMaybeEncode = <
+  S extends URLParamsSchema = readonly never[]
+>(
+  urlParams: Record<string, string | boolean | number>,
+  urlParamsSchema: S,
+  options: Omit<TSURLOptions<readonly never[]>, 'queryParams'>
+) => {
+  const { baseURL, encode, normalize } = options;
+
+  let url = constructPath(urlParams, urlParamsSchema, options);
+
+  if (baseURL) {
+    if (normalize) {
+      url = `${baseURL.replace(MATCHES_TRAILING_SLASHES, '')}/${url.replace(
+        MATCHES_LEADING_SLASHES,
+        ''
+      )}`;
+    } else {
+      url = `${baseURL}${url}`;
+    }
   }
 
   if (encode === true) {
