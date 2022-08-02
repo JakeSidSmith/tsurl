@@ -120,17 +120,44 @@ Returns `TSURL` with inferred keys for URL and query params.
 
 ### TSURL.getURLTemplate
 
-Returns a `path-to-regexp` compatible `string` from your defined schema.
+Returns a `path-to-regexp` compatible URL (including the `baseURL`) `string` from your defined schema.
 
 This method takes no arguments.
 
-### TSURL.construct
+### TSURL.getPathTemplate
 
-Returns a `string` URL/path.
+Returns a `path-to-regexp` compatible path (excluding the `baseURL`) `string` from your defined schema.
+
+This method takes no arguments.
+
+### TSURL.constructURL
+
+Returns a `string` URL (including the `baseURL`).
 
 This takes 2 arguments:
 
 - The URL params for this URL - an object with keys that match the required/optional URL params
+- The Query params for this URL - an object with keys that match the required/optional query params
+
+Note: this method will throw an error if you have not supplied required url/query params somehow (e.g. if you are not using type checking because your app is written in JavaScript, or you have cast your params to `any` in TypeScript).
+
+### TSURL.constructPath
+
+Returns a `string` path (excluding the `baseURL`).
+
+This takes 2 arguments:
+
+- The URL params for this URL - an object with keys that match the required/optional URL params
+- The Query params for this URL - an object with keys that match the required/optional query params
+
+Note: this method will throw an error if you have not supplied required url/query params somehow (e.g. if you are not using type checking because your app is written in JavaScript, or you have cast your params to `any` in TypeScript).
+
+### TSURL.constructQuery
+
+Returns a `string` of query params (prefixed with `?`) if any are provided.
+
+This takes 1 argument:
+
 - The Query params for this URL - an object with keys that match the required/optional query params
 
 Note: this method will throw an error if you have not supplied required query params somehow (e.g. if you are not using type checking because your app is written in JavaScript, or you have cast your params to `any` in TypeScript).
