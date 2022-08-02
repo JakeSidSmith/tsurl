@@ -10,7 +10,8 @@ import {
   requiredString,
 } from '../src';
 import {
-  constructPath,
+  constructPathAndMaybeEncode,
+  constructURLAndMaybeEncode,
   constructQuery,
   serializeQueryParams,
   serializeURLParams,
@@ -77,11 +78,19 @@ describe('serializeQueryParams', () => {
   });
 });
 
-describe('constructPath', () => {
+describe('constructPathAndMaybeEncode', () => {
   it('should throw if a required URL param is undefined', () => {
-    expect(() => constructPath({}, [requiredString('test')], {})).toThrow(
-      'not provided'
-    );
+    expect(() =>
+      constructPathAndMaybeEncode({}, [requiredString('test')], {})
+    ).toThrow('not provided');
+  });
+});
+
+describe('constructURLAndMaybeEncode', () => {
+  it('should throw if a required URL param is undefined', () => {
+    expect(() =>
+      constructURLAndMaybeEncode({}, [requiredString('test')], {})
+    ).toThrow('not provided');
   });
 });
 
