@@ -105,6 +105,41 @@ interface Result {
 }
 ```
 
+## Example with `baseURL`
+
+If all of your requests are prefixed with a specific domain and or path you can provide a `baseURL` as an option which may include protocol, host, port, and base path.
+
+Note: the `baseURL` is not affected by the `normalize` option, except where a base URL with a trailing slash and a path with a leading slash would cause an unwanted double slash e.g. `baseURL: https://domain.com/api/` and path `/users` would output `https://domain.com/api/users` instead of `https://domain.com/api//users`.
+
+Example base URLs:
+
+```txt
+'domain.com'
+'https://domain.com'
+'http://localhost:1234'
+'/api/'
+'domain.com/api/'
+'https://domain.com/api'
+'http://localhost:1234/api'
+```
+
+Example output:
+
+```tsx
+const url = createTSURL(['/users', requiredString('userId')], {
+  baseURL: 'https://domain.com/api/'
+});
+
+url.getURLTemplate();
+// https://domain.com/api/users/:userId
+url.getPathTemplate();
+// /api/users/:userId
+url.constructURL({userId: 'ac'}, {});
+// https://domain.com/api/users/abc
+url.constructPath();
+// /api/users/abc
+```
+
 ## API
 
 ### createTSURL
