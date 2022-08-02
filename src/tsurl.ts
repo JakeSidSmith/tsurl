@@ -12,10 +12,11 @@ import {
   URLParamsSchema,
 } from './types';
 import {
-  constructPath,
+  constructURLAndMaybeEncode,
   constructQuery,
   serializeQueryParams,
   serializeURLParams,
+  constructPathAndMaybeEncode,
 } from './utils';
 
 export class TSURL<
@@ -36,40 +37,65 @@ export class TSURL<
     this.schema = schema;
   }
 
-  public construct = (
-    urlParams: InferURLParams<S>,
-    queryParams: InferQueryParams<Q>
-  ) => {
-    const path = constructPath(urlParams, this.schema, this.options);
-
-    if (!this.options.queryParams.length) {
-      return path;
-    }
-
-    const queryParamsString = constructQuery(
+  public constructQuery = (queryParams: InferQueryParams<Q>) => {
+    const query = constructQuery(
       queryParams,
       this.options.queryParams,
       this.options
     );
 
-    if (!queryParamsString) {
+    if (query) {
+      return `?${query}`;
+    }
+
+    return '';
+  };
+
+  public constructPath = (
+    urlParams: InferURLParams<S>,
+    queryParams: InferQueryParams<Q>
+  ) => {
+    const path = constructPathAndMaybeEncode(
+      urlParams,
+      this.schema,
+      this.options
+    );
+
+    if (!this.options.queryParams.length) {
       return path;
     }
 
-    return `${path}?${queryParamsString}`;
+    return `${path}${this.constructQuery(queryParams)}`;
+  };
+
+  public constructURL = (
+    urlParams: InferURLParams<S>,
+    queryParams: InferQueryParams<Q>
+  ) => {
+    const url = constructURLAndMaybeEncode(
+      urlParams,
+      this.schema,
+      this.options
+    );
+
+    if (!this.options.queryParams.length) {
+      return url;
+    }
+
+    return `${url}${this.constructQuery(queryParams)}`;
   };
 
   public deconstruct = (url: string) => {
-    const template = this.getURLTemplate();
+    const pathTemplate = this.getPathTemplate();
     const parsed = urlParse(this.options.decode ? decodeUrl(url) : url, false);
 
     const urlMatch = match<
       Record<string, string | undefined | null | ReadonlyArray<string>>
-    >(template)(parsed.pathname);
+    >(pathTemplate)(parsed.pathname);
 
     if (!urlMatch) {
       throw new Error(
-        `Provided url "${url}" was invalid for template "${template}"`
+        `Provided url "${url}" was invalid for template "${pathTemplate}"`
       );
     }
 
@@ -85,6 +111,19 @@ export class TSURL<
     };
   };
 
+  public getPathTemplate = () => {
+    const urlParams: Record<string, string> = {};
+
+    this.schema.forEach((part) => {
+      if (typeof part === 'object') {
+        const optional = part.required ? '' : '?';
+        urlParams[part.name] = `:${part.name}${optional}`;
+      }
+    });
+
+    return constructPathAndMaybeEncode(urlParams, this.schema, this.options);
+  };
+
   public getURLTemplate = () => {
     const urlParams: Record<string, string> = {};
 
@@ -95,6 +134,6 @@ export class TSURL<
       }
     });
 
-    return constructPath(urlParams, this.schema, this.options);
+    return constructURLAndMaybeEncode(urlParams, this.schema, this.options);
   };
 }
