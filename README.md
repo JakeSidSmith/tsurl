@@ -48,7 +48,7 @@ import { userDetailURL } from './urls';
 
 // ...
 
-<Route path={userDetailURL.getURLTemplate()} component={UserDetailPage} />;
+<Route path={userDetailURL.getPathTemplate()} component={UserDetailPage} />;
 ```
 
 This outputs a path with the same syntax as required by `react-router`.
