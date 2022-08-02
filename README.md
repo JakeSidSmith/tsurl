@@ -8,7 +8,7 @@
 
 Until now you've probably been relying on keeping various bits of code in sync, or casting types `as` whatever you believe they should be to prevent errors when constructing, matching and or deconstructing URLs.
 
-TSURL prevents the need for you to worry about keeping your path templates in sync with your URL parameters, worries about accidental `//` in paths, missing URL parameters, bad protocols, unintentional or missing trailing slashes, URL encoding and decoding, query parameter construction/deconstruction, and type casting.
+TSURL prevents the need for you to worry about keeping your path templates in sync with your URL parameters, worries about accidental `//` in paths, missing URL parameters, unintentional or missing trailing slashes, URL encoding and decoding, query parameter construction/deconstruction, and type casting.
 
 Built on top of existing libraries that you're probably already using, such as `path-to-regexp`, `encodeurl` `query-string`, `url-parse`, etc, TSURL combines their functionality to provide a type safe interface for working with URLs and paths.
 
@@ -166,11 +166,11 @@ The options object is the second argument to the `createTSURL` function. All ava
 
 Options include:
 
-- `protocol` - `string | false` - protocol to enforce, or remove if set to `false`. Does nothing by default.
+- `baseURL` - `string` - base URL to prefix constructed URLs with (can include protocol, host, port, and base path e.g. `https://domain.com/api`).
 - `trailingSlash` - `boolean` - enforce or remove trailing slashes. Does nothing by default.
 - `encode` - `boolean` - whether to encode the URL when constructing. Defaults to `true`.
 - `decode` - `boolean` - whether to decode the URL when deconstructing. Default to `true`.
-- `normalize` - `boolean` - whether to strip **all** double slashes (`//`, including those that may be part of a protocol). Defaults to `true`. You should define an explicit `protocol` to avoid `//` being stripped from the protocol if your URL contains one.
+- `normalize` - `boolean` - whether to strip **all** double slashes from the path (`//`, excluding the `baseURL`, except where this causes multiple trailing slashes e.g. `createTSURL` with `baseURL: 'https://domain.com/api/'` and path parts `['/users']` will construct `https://domain.com/api/users`). Defaults to `true`.
 - `queryArrayFormat` - how to handle constructing/deconstructing query params that can have multiple values. This option is defined by the `query-string` package.
 - `queryArrayFormatSeparator` - `string` - the separator to use when `queryArrayFormat` is set to `separator`. Defaults to `,`.
 - `queryParams` - an array of [parameters](#parameters).
