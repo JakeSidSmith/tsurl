@@ -224,6 +224,19 @@ describe('TSURL', () => {
         'https://test.com/api/test/?optional=hello'
       );
     });
+
+    it('should allow overriding the default options', () => {
+      const url = createTSURL(['/api/test/'], {
+        baseURL: 'https://test.com/',
+        trailingSlash: true,
+      });
+
+      expect(url.constructURL({}, {})).toBe('https://test.com/api/test/');
+
+      expect(
+        url.constructURL({}, {}, { baseURL: 'https://override.com/' })
+      ).toBe('https://override.com/api/test/');
+    });
   });
 
   describe('deconstruct', () => {

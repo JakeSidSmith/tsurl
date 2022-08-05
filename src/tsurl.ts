@@ -70,15 +70,17 @@ export class TSURL<
 
   public constructURL = (
     urlParams: InferURLParams<S>,
-    queryParams: InferQueryParams<Q>
+    queryParams: InferQueryParams<Q>,
+    optionOverrides?: Partial<Pick<TSURLOptions<Q>, 'baseURL'>>
   ) => {
-    const url = constructURLAndMaybeEncode(
-      urlParams,
-      this.schema,
-      this.options
-    );
+    const options = {
+      ...this.options,
+      ...optionOverrides,
+    };
 
-    if (!this.options.queryParams.length) {
+    const url = constructURLAndMaybeEncode(urlParams, this.schema, options);
+
+    if (!options.queryParams.length) {
       return url;
     }
 
