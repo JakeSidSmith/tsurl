@@ -169,11 +169,11 @@ This method takes no arguments.
 
 Returns a `string` URL (including the `baseURL`).
 
-This takes 3 arguments:
+This takes 2 or 3 arguments:
 
 - The URL params for this URL - an object with keys that match the required/optional URL params
 - The Query params for this URL - an object with keys that match the required/optional query params
-- Option overrides - an options object that will override any options provided when the TSURL was initially defined (currently limited to only `baseURL`)
+- Option overrides (optional) - an options object that will override any options provided when the TSURL was initially defined (currently limited to only `baseURL`)
 
 Note: this method will throw an error if you have not supplied required url/query params somehow (e.g. if you are not using type checking because your app is written in JavaScript, or you have cast your params to `any` in TypeScript).
 
