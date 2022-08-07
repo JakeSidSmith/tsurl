@@ -134,7 +134,7 @@ url.getURLTemplate();
 // https://domain.com/api/users/:userId
 url.getPathTemplate();
 // /api/users/:userId
-url.constructURL({userId: 'ac'}, {});
+url.constructURL({ userId: 'abc' }, {});
 // https://domain.com/api/users/abc
 url.constructPath();
 // /api/users/abc
