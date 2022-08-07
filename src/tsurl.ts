@@ -34,7 +34,11 @@ export class TSURL<
       // We cast a default queryParams so that the output type of deconstruct doesn't have to handle it potentially being undefined
       queryParams: options?.queryParams ?? ([] as unknown as Q),
     };
-    this.schema = schema;
+    const schemaPrefix =
+      typeof options?.basePath !== 'undefined'
+        ? ([] as readonly string[]).concat(options.basePath)
+        : [];
+    this.schema = [...schemaPrefix, ...schema] as unknown as S;
   }
 
   public constructQuery = (queryParams: InferQueryParams<Q>) => {

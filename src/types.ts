@@ -59,6 +59,7 @@ export type QueryParamsSchema = ReadonlyArray<
 
 export interface TSURLOptions<Q extends QueryParamsSchema> {
   baseURL?: string;
+  basePath?: string | readonly string[];
   trailingSlash?: boolean;
   encode?: boolean;
   decode?: boolean;
