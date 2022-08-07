@@ -1,6 +1,6 @@
 {
   "name": "@jakesidsmith/tsurl",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "description": "Type safe URL construction and deconstruction",
   "main": "dist/index.js",
   "scripts": {
