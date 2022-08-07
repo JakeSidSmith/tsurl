@@ -16,6 +16,22 @@ const createTSURL = <
   return new TSURL(schema, options);
 };
 
-export { createTSURL };
+const createTSURLGroup = (
+  options: Omit<TSURLOptions<never>, 'queryParams'>
+) => {
+  const createTSURL = <
+    S extends URLParamsSchema = readonly never[],
+    Q extends QueryParamsSchema = readonly never[]
+  >(
+    schema: S,
+    optionOverrides: TSURLOptions<Q> = DEFAULT_OPTIONS
+  ) => {
+    return new TSURL(schema, { ...options, ...optionOverrides });
+  };
+
+  return { createTSURL };
+};
+
+export { createTSURL, createTSURLGroup };
 
 export default createTSURL;

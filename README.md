@@ -105,9 +105,9 @@ interface Result {
 }
 ```
 
-## Example with `baseURL`
+## Example with `baseURL`/`basePath`
 
-If all of your requests are prefixed with a specific domain and or path you can provide a `baseURL` as an option which may include protocol, host, port, and base path.
+If all of your requests are prefixed with a specific domain and or path you can provide a `baseURL` and or `basePath` as an option. The `baseURL` may include protocol, host, port, and base path, but I'd recommend using `basePath` for paths in most circumstances.
 
 Note: the `baseURL` is not affected by the `normalize` option, except where a base URL with a trailing slash and a path with a leading slash would cause an unwanted double slash e.g. `baseURL: https://domain.com/api/` and path `/users` would output `https://domain.com/api/users` instead of `https://domain.com/api//users`.
 
@@ -127,17 +127,46 @@ Example output:
 
 ```tsx
 const url = createTSURL(['/users', requiredString('userId')], {
-  baseURL: 'https://domain.com/api/'
+  baseURL: 'https://domain.com/',
+  basePath: '/api',
 });
 
 url.getURLTemplate();
 // https://domain.com/api/users/:userId
 url.getPathTemplate();
 // /api/users/:userId
-url.constructURL({userId: 'ac'}, {});
+url.constructURL({ userId: 'abc' }, {});
 // https://domain.com/api/users/abc
 url.constructPath();
 // /api/users/abc
+```
+
+## Example using groups
+
+If we have our API running on a different domain we can use groups to pre-fill `baseURL`, `basePath` (and or any other options) for client and API URLs.
+
+```ts
+const api = createTSURLGroup({
+  baseUrl: 'https://server.com',
+  basePath: '/api',
+  trailingSlash: true,
+});
+
+const API_URLS = {
+  users: api.createTSURL(['users']),
+  user: api.createTSURL(['users', requiredString('userId')]),
+  userImages: api.createTSURL(['users', requiredString('userId'), 'images']),
+};
+
+const client = createTSURLGroup({
+  baseUrl: 'https://client.com',
+  trailingSlash: false,
+});
+
+const CLIENT_URLS = {
+  users: client.createTSURL(['users']),
+  user: client.createTSURL(['users', requiredString('userId')]),
+};
 ```
 
 ## API
@@ -152,6 +181,18 @@ This takes 1 or 2 arguments:
 - An options object (optional) - `Options` - see [Options](#options) for more info
 
 Returns `TSURL` with inferred keys for URL and query params.
+
+### createTSURLGroup
+
+The `createTSURLGroup` function, returns an object with a `createTSURL` function.
+
+This takes 1 argument:
+
+- An options object - `Options` - see [Options](#options) for more info
+
+#### group.createTSURL
+
+As with the named/default exported `createTSURL`, but inherits options from the group.
 
 ### TSURL.getURLTemplate
 
@@ -229,6 +270,7 @@ The options object is the second argument to the `createTSURL` function. All ava
 Options include:
 
 - `baseURL` - `string` - base URL to prefix constructed URLs with (can include protocol, host, port, and base path e.g. `https://domain.com/api`).
+- `basePath` - `string | readonly string[]` - path to prefix the schema (path parts) for all URLs created with the group.
 - `trailingSlash` - `boolean` - enforce or remove trailing slashes. Does nothing by default.
 - `encode` - `boolean` - whether to encode the URL when constructing. Defaults to `true`.
 - `decode` - `boolean` - whether to decode the URL when deconstructing. Default to `true`.

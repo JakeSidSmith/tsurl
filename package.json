@@ -1,12 +1,12 @@
 {
   "name": "@jakesidsmith/tsurl",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "description": "Type safe URL construction and deconstruction",
   "main": "dist/index.js",
   "scripts": {
     "dist": "rm -rf dist && tsc --project tsconfig.dist.json",
-    "prettier": "prettier --write '**/*.{ts,tsx,js,jsx,json}'",
-    "prettier-check": "prettier --check '**/*.{ts,tsx,js,jsx,json}'",
+    "prettier": "prettier --write '**/*.{ts,tsx,js,jsx,json,md}'",
+    "prettier-check": "prettier --check '**/*.{ts,tsx,js,jsx,json,md}'",
     "lint-js": "eslint '**/*.{ts,tsx,js,jsx}'",
     "typecheck": "tsc --project tsconfig.json --noEmit && tsassert",
     "lint": "npm run prettier-check && npm run typecheck && npm run lint-js",
