@@ -194,23 +194,15 @@ export const serializeURLParams = <
     if (typeof part !== 'string') {
       const value = params[part.name];
 
-      if (part.type === PartType.SPLAT) {
-        if (value === null) {
-          throw new Error(`Invalid null value for URL param "${part.name}"`);
-        }
-
-        serializedParams[part.name] = serializeValue(part, value);
-      } else {
-        if (part.required && typeof value === 'undefined') {
-          throw new Error(`Required URL param "${part.name}" was undefined`);
-        }
-
-        if (value === null) {
-          throw new Error(`Invalid null value for URL param "${part.name}"`);
-        }
-
-        serializedParams[part.name] = serializeValue(part, value);
+      if (part.required && typeof value === 'undefined') {
+        throw new Error(`Required URL param "${part.name}" was undefined`);
       }
+
+      if (value === null) {
+        throw new Error(`Invalid null value for URL param "${part.name}"`);
+      }
+
+      serializedParams[part.name] = serializeValue(part, value);
     }
   });
 
@@ -267,7 +259,7 @@ export const constructPath = <S extends URLParamsSchema = readonly never[]>(
       const value = urlParams[part.name];
 
       if (typeof value === 'undefined') {
-        if (part.type !== PartType.SPLAT && part.required) {
+        if (part.required) {
           throw new Error(`Required URL param "${part.name}" was not provided`);
         }
 

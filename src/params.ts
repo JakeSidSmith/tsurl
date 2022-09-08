@@ -136,6 +136,7 @@ export class OptionalBooleanArray<T extends string> {
 
 export class Splat<T extends string> {
   public readonly type = PartType.SPLAT as const;
+  public readonly required = false as const;
   public name: T;
 
   public constructor(name: T) {
