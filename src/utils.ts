@@ -362,14 +362,14 @@ export const constructQuery = <Q extends QueryParamsSchema = readonly never[]>(
     | readonly boolean[]
     | readonly number[]
   >,
-  queryParamsShema: Q,
+  queryParamsSchema: Q,
   options: TSURLOptions<Q>
 ) => {
   const { encode, queryArrayFormat, queryArrayFormatSeparator } = options;
 
   const filteredQueryParams: Record<string, unknown> = {};
 
-  queryParamsShema.forEach((part) => {
+  queryParamsSchema.forEach((part) => {
     const value = queryParams[part.name];
 
     if (typeof value !== 'undefined') {
