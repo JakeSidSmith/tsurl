@@ -286,9 +286,10 @@ Note: this method will throw an error if you have not supplied required query pa
 
 Returns the URL and query params extracted from a string URL/path.
 
-This takes a single argument:
+This takes 1 or 2 arguments:
 
 - URL/path - `string` - the URL you wish to extract parameters from
+- An options object (optional) - `Options` - see [Deconstruct Options](#deconstructoptions) for more info
 
 Returns an object with `urlParams` and `queryParams` keys. Both of these keys will be objects containing the parameters you defined in your schema e.g.
 
@@ -322,6 +323,14 @@ Options include:
 - `queryArrayFormat` - how to handle constructing/deconstructing query params that can have multiple values. This option is defined by the `query-string` package.
 - `queryArrayFormatSeparator` - `string` - the separator to use when `queryArrayFormat` is set to `separator`. Defaults to `,`.
 - `queryParams` - an array of [parameters](#parameters).
+
+### Deconstruct Options
+
+This is the second argument to the `deconstruct` function.
+
+Options include:
+
+- `allowSubPaths` - `boolean` - whether the deconstruction will allow sub-paths (stuff that appears after your defined template) in the provided URL/path
 
 ### Parameters
 
