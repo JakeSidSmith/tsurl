@@ -11,6 +11,7 @@ export enum PartType {
   OPTIONAL_STRING_ARRAY = 'OPTIONAL_STRING_ARRAY',
   OPTIONAL_NUMBER_ARRAY = 'OPTIONAL_NUMBER_ARRAY',
   OPTIONAL_BOOLEAN_ARRAY = 'OPTIONAL_BOOLEAN_ARRAY',
+  SPLAT = 'SPLAT',
 }
 
 export class RequiredString<T extends string> {
@@ -133,6 +134,15 @@ export class OptionalBooleanArray<T extends string> {
   }
 }
 
+export class Splat<T extends string> {
+  public readonly type = PartType.SPLAT as const;
+  public name: T;
+
+  public constructor(name: T) {
+    this.name = name;
+  }
+}
+
 export const requiredString = <T extends string>(name: T) =>
   new RequiredString(name);
 
@@ -168,3 +178,5 @@ export const optionalNumberArray = <T extends string>(name: T) =>
 
 export const optionalBooleanArray = <T extends string>(name: T) =>
   new OptionalBooleanArray(name);
+
+export const splat = <T extends string>(name: T) => new Splat(name);

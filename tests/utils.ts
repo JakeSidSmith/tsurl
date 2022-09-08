@@ -8,6 +8,7 @@ import {
   requiredBoolean,
   requiredBooleanArray,
   requiredString,
+  splat,
 } from '../src';
 import {
   constructPathAndMaybeEncode,
@@ -61,6 +62,12 @@ describe('serializeURLParams', () => {
     expect(() =>
       serializeURLParams({ test: null }, [optionalString('test')])
     ).toThrow('Invalid null');
+  });
+
+  it('should throw if a URL splat param is null', () => {
+    expect(() => serializeURLParams({ test: null }, [splat('test')])).toThrow(
+      'Invalid null'
+    );
   });
 });
 

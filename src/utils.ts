@@ -14,12 +14,14 @@ import {
   OptionalNumberArray,
   OptionalString,
   OptionalStringArray,
+  PartType,
   RequiredBoolean,
   RequiredBooleanArray,
   RequiredNumber,
   RequiredNumberArray,
   RequiredString,
   RequiredStringArray,
+  Splat,
 } from './params';
 import {
   AnyPart,
@@ -158,6 +160,16 @@ export const serializeValue = <T extends string>(
     }
   }
 
+  if (part instanceof Splat) {
+    if (typeof value === 'string' || Array.isArray(value)) {
+      return ([] as readonly string[]).concat(value);
+    }
+
+    if (typeof value === 'undefined') {
+      return value;
+    }
+  }
+
   throw new Error(`Invalid value for part "${part.name}" - ${value}`);
 };
 
@@ -182,15 +194,23 @@ export const serializeURLParams = <
     if (typeof part !== 'string') {
       const value = params[part.name];
 
-      if (part.required && typeof value === 'undefined') {
-        throw new Error(`Required URL param "${part.name}" was undefined`);
-      }
+      if (part.type === PartType.SPLAT) {
+        if (value === null) {
+          throw new Error(`Invalid null value for URL param "${part.name}"`);
+        }
 
-      if (value === null) {
-        throw new Error(`Invalid null value for URL param "${part.name}"`);
-      }
+        serializedParams[part.name] = serializeValue(part, value);
+      } else {
+        if (part.required && typeof value === 'undefined') {
+          throw new Error(`Required URL param "${part.name}" was undefined`);
+        }
 
-      serializedParams[part.name] = serializeValue(part, value);
+        if (value === null) {
+          throw new Error(`Invalid null value for URL param "${part.name}"`);
+        }
+
+        serializedParams[part.name] = serializeValue(part, value);
+      }
     }
   });
 
@@ -232,7 +252,7 @@ export const serializeQueryParams = <
 };
 
 export const constructPath = <S extends URLParamsSchema = readonly never[]>(
-  urlParams: Record<string, string | boolean | number>,
+  urlParams: Record<string, string | boolean | number | readonly string[]>,
   urlParamsSchema: S,
   options: Omit<TSURLOptions<readonly never[]>, 'queryParams'>
 ) => {
@@ -247,11 +267,15 @@ export const constructPath = <S extends URLParamsSchema = readonly never[]>(
       const value = urlParams[part.name];
 
       if (typeof value === 'undefined') {
-        if (part.required) {
+        if (part.type !== PartType.SPLAT && part.required) {
           throw new Error(`Required URL param "${part.name}" was not provided`);
         }
 
         return '';
+      }
+
+      if (part.type === PartType.SPLAT && Array.isArray(value)) {
+        return value.join('/');
       }
 
       return value.toString();
