@@ -56,7 +56,7 @@ This outputs a path with the same syntax as required by `react-router`.
 Now, if you wanted to navigate to this URL you'd probably previously have used string concatenation, a template string, or `path-to-regexp` to construct the path, but none of these offer type safety. Instead now you can use your TSURL instance to construct a path. It will enforce that you provide a string for the user's ID.
 
 ```ts
-const whereWeWantToGo = userDetailURL.construct({ id: 'abc' }, {});
+const whereWeWantToGo = userDetailURL.constructPath({ id: 'abc' }, {});
 ```
 
 This will output `/users/abc/` exactly as we'd expect, but would fail type checks if the `id` key was missing from the URL parameters object. The second argument is the query params object, but since we don't need any, we've just provided an empty object. Note: this method will throw an error if you somehow fail to supply the user id e.g. not using type checking, or cast your params to `any`.
@@ -88,11 +88,11 @@ const userListURL = createTSURL(['/users'], {
 Here we've constructed a TSURL instance that will not only enforce that we provide a number (or nothing as we may not want to define the page number for the first page) when constructing a URL for this route, but also will give us sensible types for the parameters when deconstructing.
 
 ```ts
-userListURL.construct({}, {}); // Is fine because page is optional
-userListURL.construct({}, { page: 2 }); // Is fine because page should be a number
+userListURL.constructPath({}, {}); // Is fine because page is optional
+userListURL.constructPath({}, { page: 2 }); // Is fine because page should be a number
 
-userListURL.construct({}, { page: '2' }); // Disallowed by types (would error)
-userListURL.construct({}, { page: null }); // Disallowed by types (would error)
+userListURL.constructPath({}, { page: '2' }); // Disallowed by types (would error)
+userListURL.constructPath({}, { page: null }); // Disallowed by types (would error)
 
 // The below deconstruct will handle casting the page query param to a number if found
 userListURL.deconstruct(window.location.href);
@@ -137,7 +137,7 @@ url.getPathTemplate();
 // /api/users/:userId
 url.constructURL({ userId: 'abc' }, {});
 // https://domain.com/api/users/abc
-url.constructPath();
+url.constructPath({ userId: 'abc' }, {});
 // /api/users/abc
 ```
 
