@@ -186,10 +186,10 @@ url.constructPath({ userId: 'abc' }, {});
 url.constructPath({ userId: 'abc', splat: ['posts', '123'] }, {});
 // returns '/api/user/abc/posts/123'
 
-url.deconstruct('https://server.com/user/abc');
+url.deconstruct('https://server.com/api/user/abc');
 // returns { urlParams: { userId: 'abc', splat: undefined }, queryParams: {} }
 
-url.deconstruct('https://server.com/user/123/posts/123');
+url.deconstruct('https://server.com/api/user/123/posts/123');
 // returns { urlParams: { userId: '123', splat: ['posts', '123'] }, queryParams: {} }
 ```
 
@@ -204,10 +204,10 @@ const url = createTSURL(['user', requiredString('userId')], {
   trailingSlash: false,
 });
 
-url.deconstruct('https://server.com/user/123/posts/123');
+url.deconstruct('https://server.com/api/user/123/posts/123');
 // throws an error
 
-url.deconstruct('https://server.com/user/123/posts/123', {
+url.deconstruct('https://server.com/api/user/123/posts/123', {
   allowSubPaths: true,
 });
 // returns { urlParams: { userId: '123' }, queryParams: {} }
