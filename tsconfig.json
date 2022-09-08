@@ -9,6 +9,7 @@
     "resolveJsonModule": true,
     "esModuleInterop": true,
     "noUncheckedIndexedAccess": true,
+    "noErrorTruncation": true,
     "moduleResolution": "node",
     "jsx": "react",
     "target": "es6",
