@@ -74,6 +74,10 @@ export interface TSURLOptions<Q extends QueryParamsSchema> {
   queryParams?: Q;
 }
 
+export interface DeconstructOptions {
+  allowSubPaths?: boolean;
+}
+
 export type InferURLParams<S extends URLParamsSchema = readonly never[]> =
   S extends readonly (infer V)[]
     ? {
