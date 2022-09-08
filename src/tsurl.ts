@@ -104,7 +104,7 @@ export class TSURL<
     const parsed = urlParse(this.options.decode ? decodeUrl(url) : url, false);
 
     const urlMatch = match<
-      Record<string, string | undefined | null | ReadonlyArray<string>>
+      Record<string, string | undefined | null | readonly string[]>
     >(pathTemplate)(parsed.pathname);
 
     if (!urlMatch) {

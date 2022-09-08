@@ -36,7 +36,7 @@ export type AnyPart<T extends string> =
   | OptionalPart<T>
   | Splat<T>;
 
-export type URLParamsSchema = ReadonlyArray<
+export type URLParamsSchema = readonly (
   | string
   | RequiredString<string>
   | RequiredNumber<string>
@@ -45,9 +45,9 @@ export type URLParamsSchema = ReadonlyArray<
   | OptionalNumber<string>
   | OptionalBoolean<string>
   | Splat<string>
->;
+)[];
 
-export type QueryParamsSchema = ReadonlyArray<
+export type QueryParamsSchema = readonly (
   | RequiredString<string>
   | RequiredNumber<string>
   | RequiredBoolean<string>
@@ -60,7 +60,7 @@ export type QueryParamsSchema = ReadonlyArray<
   | OptionalStringArray<string>
   | OptionalNumberArray<string>
   | OptionalBooleanArray<string>
->;
+)[];
 
 export interface TSURLOptions<Q extends QueryParamsSchema> {
   baseURL?: string;

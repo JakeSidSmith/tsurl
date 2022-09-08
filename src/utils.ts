@@ -35,7 +35,7 @@ import {
 
 export const serializeValue = <T extends string>(
   part: AnyPart<T>,
-  value: string | undefined | ReadonlyArray<string>
+  value: string | undefined | readonly string[]
 ) => {
   if (part instanceof RequiredString && typeof value === 'string') {
     return value;
@@ -177,7 +177,7 @@ export const serializeValue = <T extends string>(
 export const serializeURLParams = <
   S extends URLParamsSchema = readonly never[]
 >(
-  params: Record<string, string | undefined | null | ReadonlyArray<string>>,
+  params: Record<string, string | undefined | null | readonly string[]>,
   schema: S
 ) => {
   const serializedParams: Record<
@@ -213,7 +213,7 @@ export const serializeURLParams = <
 export const serializeQueryParams = <
   Q extends QueryParamsSchema = readonly never[]
 >(
-  params: Record<string, string | undefined | null | ReadonlyArray<string>>,
+  params: Record<string, string | undefined | null | readonly string[]>,
   schema: Q
 ) => {
   const serializedParams: Record<
