@@ -12,6 +12,7 @@ import type {
   RequiredNumberArray,
   RequiredString,
   RequiredStringArray,
+  Splat,
 } from './params';
 
 export type RequiredPart<T extends string> =
@@ -30,7 +31,10 @@ export type OptionalPart<T extends string> =
   | OptionalNumberArray<T>
   | OptionalBooleanArray<T>;
 
-export type AnyPart<T extends string> = RequiredPart<T> | OptionalPart<T>;
+export type AnyPart<T extends string> =
+  | RequiredPart<T>
+  | OptionalPart<T>
+  | Splat<T>;
 
 export type URLParamsSchema = ReadonlyArray<
   | string
@@ -40,6 +44,7 @@ export type URLParamsSchema = ReadonlyArray<
   | OptionalString<string>
   | OptionalNumber<string>
   | OptionalBoolean<string>
+  | Splat<string>
 >;
 
 export type QueryParamsSchema = ReadonlyArray<
@@ -83,6 +88,8 @@ export type InferURLParams<S extends URLParamsSchema = readonly never[]> =
         [P in V extends OptionalNumber<infer Name> ? Name : never]?: number;
       } & {
         [P in V extends OptionalBoolean<infer Name> ? Name : never]?: boolean;
+      } & {
+        [P in V extends Splat<infer Name> ? Name : never]?: readonly string[];
       }
     : never;
 

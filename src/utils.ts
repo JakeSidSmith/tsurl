@@ -14,12 +14,14 @@ import {
   OptionalNumberArray,
   OptionalString,
   OptionalStringArray,
+  PartType,
   RequiredBoolean,
   RequiredBooleanArray,
   RequiredNumber,
   RequiredNumberArray,
   RequiredString,
   RequiredStringArray,
+  Splat,
 } from './params';
 import {
   AnyPart,
@@ -158,6 +160,16 @@ export const serializeValue = <T extends string>(
     }
   }
 
+  if (part instanceof Splat) {
+    if (typeof value === 'string' || Array.isArray(value)) {
+      return ([] as readonly string[]).concat(value);
+    }
+
+    if (typeof value === 'undefined') {
+      return value;
+    }
+  }
+
   throw new Error(`Invalid value for part "${part.name}" - ${value}`);
 };
 
@@ -232,7 +244,7 @@ export const serializeQueryParams = <
 };
 
 export const constructPath = <S extends URLParamsSchema = readonly never[]>(
-  urlParams: Record<string, string | boolean | number>,
+  urlParams: Record<string, string | boolean | number | readonly string[]>,
   urlParamsSchema: S,
   options: Omit<TSURLOptions<readonly never[]>, 'queryParams'>
 ) => {
@@ -252,6 +264,10 @@ export const constructPath = <S extends URLParamsSchema = readonly never[]>(
         }
 
         return '';
+      }
+
+      if (part.type === PartType.SPLAT && Array.isArray(value)) {
+        return value.join('/');
       }
 
       return value.toString();

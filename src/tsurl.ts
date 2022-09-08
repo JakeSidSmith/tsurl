@@ -4,6 +4,7 @@ import queryString from 'query-string';
 import urlParse from 'url-parse';
 
 import { DEFAULT_OPTIONS } from './constants';
+import { PartType } from './params';
 import {
   InferQueryParams,
   InferURLParams,
@@ -115,29 +116,26 @@ export class TSURL<
     };
   };
 
-  public getPathTemplate = () => {
+  private getURLParams = () => {
     const urlParams: Record<string, string> = {};
 
     this.schema.forEach((part) => {
       if (typeof part === 'object') {
-        const optional = part.required ? '' : '?';
-        urlParams[part.name] = `:${part.name}${optional}`;
+        if (part.type === PartType.SPLAT) {
+          urlParams[part.name] = `:${part.name}*`;
+        } else {
+          const optional = part.required ? '' : '?';
+          urlParams[part.name] = `:${part.name}${optional}`;
+        }
       }
     });
 
-    return constructPathAndMaybeEncode(urlParams, this.schema, this.options);
+    return urlParams;
   };
 
-  public getURLTemplate = () => {
-    const urlParams: Record<string, string> = {};
+  public getPathTemplate = () =>
+    constructPathAndMaybeEncode(this.getURLParams(), this.schema, this.options);
 
-    this.schema.forEach((part) => {
-      if (typeof part === 'object') {
-        const optional = part.required ? '' : '?';
-        urlParams[part.name] = `:${part.name}${optional}`;
-      }
-    });
-
-    return constructURLAndMaybeEncode(urlParams, this.schema, this.options);
-  };
+  public getURLTemplate = () =>
+    constructURLAndMaybeEncode(this.getURLParams(), this.schema, this.options);
 }

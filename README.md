@@ -169,6 +169,30 @@ const CLIENT_URLS = {
 };
 ```
 
+## Example using splat
+
+If we want to match any trailing part of a URL/path we can do so using a `splat` URL part.
+
+```ts
+const url = createTSURL(['user', requiredString('userId'), splat('splat')], {
+  baseUrl: 'https://server.com',
+  basePath: '/api',
+  trailingSlash: false,
+});
+
+url.constructPath({ userId: 'abc' }, {});
+// returns '/api/user/abc'
+
+url.constructPath({ userId: 'abc', splat: ['posts', '123'] }, {});
+// returns '/api/user/abc/posts/123'
+
+url.deconstruct('https://server.com/user/abc');
+// returns { urlParams: { userId: 'abc', splat: undefined }, queryParams: {} }
+
+url.deconstruct('https://server.com/user/123/posts/123');
+// returns { urlParams: { userId: '123', splat: ['posts', '123'] }, queryParams: {} }
+```
+
 ## API
 
 ### createTSURL
@@ -291,9 +315,16 @@ The URL schema supports the following:
 - `optionalString`
 - `optionalNumber`
 - `optionalBoolean`
+- `splat`
 
-In addition to the ones listed above, the query params schema also supports the following:
+The query params schema supports the following:
 
+- `requiredString`
+- `requiredNumber`
+- `requiredBoolean`
+- `optionalString`
+- `optionalNumber`
+- `optionalBoolean`
 - `requiredStringArray`
 - `requiredNumberArray`
 - `requiredBooleanArray`
