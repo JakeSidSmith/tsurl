@@ -153,7 +153,7 @@ describe('params', () => {
       }
     );
 
-    // @tsassert: (urlParams: { required: string; } & {} & {} & { optional?: string | undefined; } & {} & {} & {}, queryParams: { requiredQ: string; } & {} & {} & { optionalQ?: string | undefined; } & {} & {} & {} & {} & {} & {} & {} & {}) => string
+    // @tsassert: (urlParams: { required: string; } & { optional?: string | undefined; }, queryParams: { requiredQ: string; } & { optionalQ?: string | undefined; }) => string
     const constructPath = url.constructPath;
 
     expect(constructPath({ required: 'a' }, { requiredQ: 'c' })).toBe(
@@ -166,7 +166,7 @@ describe('params', () => {
       )
     ).toBe('/api/example/a/test/b?optionalQ=d&requiredQ=c');
 
-    // @tsassert: (url: string) => { urlParams: { required: string; } & {} & {} & { optional?: string | undefined; } & {} & {} & {}; queryParams: { requiredQ: string; } & {} & {} & { optionalQ?: string | undefined; } & ... 7 more ... & {}; }
+    // @tsassert: (url: string, deconstructOptions?: DeconstructOptions | undefined) => { urlParams: { required: string; } & { optional?: string | undefined; }; queryParams: { requiredQ: string; } & { optionalQ?: string | undefined; }; }
     const deconstruct = url.deconstruct;
 
     expect(deconstruct('/api/example/a/test?requiredQ=c')).toEqual({
@@ -206,7 +206,7 @@ describe('params', () => {
       }
     );
 
-    // @tsassert: (urlParams: {} & { required: number; } & {} & {} & { optional?: number | undefined; } & {} & {}, queryParams: {} & { requiredQ: number; } & {} & {} & { optionalQ?: number | undefined; } & {} & {} & {} & {} & {} & {} & {}) => string
+    // @tsassert: (urlParams: { required: number; } & { optional?: number | undefined; }, queryParams: { requiredQ: number; } & { optionalQ?: number | undefined; }) => string
     const constructPath = url.constructPath;
 
     expect(constructPath({ required: 1 }, { requiredQ: 3 })).toBe(
@@ -219,7 +219,7 @@ describe('params', () => {
       )
     ).toBe('/api/example/1/test/2?optionalQ=4&requiredQ=3');
 
-    // @tsassert: (url: string) => { urlParams: {} & { required: number; } & {} & {} & { optional?: number | undefined; } & {} & {}; queryParams: {} & { requiredQ: number; } & {} & {} & { optionalQ?: number | undefined; } & ... 6 more ... & {}; }
+    // @tsassert: (url: string, deconstructOptions?: DeconstructOptions | undefined) => { urlParams: { required: number; } & { optional?: number | undefined; }; queryParams: { requiredQ: number; } & { optionalQ?: number | undefined; }; }
     const deconstruct = url.deconstruct;
 
     expect(deconstruct('/api/example/1/test?requiredQ=3')).toEqual({
@@ -262,7 +262,7 @@ describe('params', () => {
       }
     );
 
-    // @tsassert: (urlParams: {} & {} & { required: boolean; } & {} & {} & { optional?: boolean | undefined; } & {}, queryParams: {} & {} & { requiredQ: boolean; } & {} & {} & { optionalQ?: boolean | undefined; } & {} & ... 4 more ... & {}) => string
+    // @tsassert: (urlParams: { required: boolean; } & { optional?: boolean | undefined; }, queryParams: { requiredQ: boolean; } & { optionalQ?: boolean | undefined; }) => string
     const constructPath = url.constructPath;
 
     expect(constructPath({ required: true }, { requiredQ: true })).toBe(
@@ -275,7 +275,7 @@ describe('params', () => {
       )
     ).toBe('/api/example/true/test/false?optionalQ=false&requiredQ=true');
 
-    // @tsassert: (url: string) => { urlParams: {} & {} & { required: boolean; } & {} & {} & { optional?: boolean | undefined; } & {}; queryParams: {} & {} & { requiredQ: boolean; } & {} & {} & { optionalQ?: boolean | undefined; } & ... 5 more ... & {}; }
+    // @tsassert: (url: string, deconstructOptions?: DeconstructOptions | undefined) => { urlParams: { required: boolean; } & { optional?: boolean | undefined; }; queryParams: { requiredQ: boolean; } & { optionalQ?: boolean | undefined; }; }
     const deconstruct = url.deconstruct;
 
     expect(deconstruct('/api/example/true/test?requiredQ=true')).toEqual({
@@ -310,7 +310,7 @@ describe('params', () => {
       ],
     });
 
-    // @tsassert: (urlParams: {} & {} & {} & {} & {} & {} & {}, queryParams: {} & {} & {} & {} & {} & {} & { requiredQ: readonly string[]; } & {} & {} & { optionalQ?: readonly string[] | undefined; } & {} & {}) => string
+    // @tsassert: (urlParams: {} & {}, queryParams: { requiredQ: readonly string[]; } & { optionalQ?: readonly string[] | undefined; }) => string
     const constructPath1 = url1.constructPath;
 
     expect(constructPath1({}, { requiredQ: ['a', 'b'] })).toBe(
@@ -320,7 +320,7 @@ describe('params', () => {
       constructPath1({}, { requiredQ: ['a', 'b'], optionalQ: ['c', 'd'] })
     ).toBe('/api/example?optionalQ=c&optionalQ=d&requiredQ=a&requiredQ=b');
 
-    // @tsassert: (url: string) => { urlParams: {} & {} & {} & {} & {} & {} & {}; queryParams: {} & {} & {} & {} & {} & {} & { requiredQ: readonly string[]; } & {} & {} & { optionalQ?: readonly string[] | undefined; } & {} & {}; }
+    // @tsassert: (url: string, deconstructOptions?: DeconstructOptions | undefined) => { urlParams: {} & {}; queryParams: { requiredQ: readonly string[]; } & { optionalQ?: readonly string[] | undefined; }; }
     const deconstruct1 = url1.deconstruct;
 
     expect(deconstruct1('/api/example?requiredQ=a&requiredQ=b')).toEqual({
@@ -350,7 +350,7 @@ describe('params', () => {
       queryArrayFormat: 'comma',
     });
 
-    // @tsassert: (urlParams: {} & {} & {} & {} & {} & {} & {}, queryParams: {} & {} & {} & {} & {} & {} & { requiredQ: readonly string[]; } & {} & {} & { optionalQ?: readonly string[] | undefined; } & {} & {}) => string
+    // @tsassert: (urlParams: {} & {}, queryParams: { requiredQ: readonly string[]; } & { optionalQ?: readonly string[] | undefined; }) => string
     const constructPath2 = url2.constructPath;
 
     expect(constructPath2({}, { requiredQ: ['a', 'b'] })).toBe(
@@ -360,7 +360,7 @@ describe('params', () => {
       constructPath2({}, { requiredQ: ['a', 'b'], optionalQ: ['c', 'd'] })
     ).toBe('/api/example?optionalQ=c,d&requiredQ=a,b');
 
-    // @tsassert: (url: string) => { urlParams: {} & {} & {} & {} & {} & {} & {}; queryParams: {} & {} & {} & {} & {} & {} & { requiredQ: readonly string[]; } & {} & {} & { optionalQ?: readonly string[] | undefined; } & {} & {}; }
+    // @tsassert: (url: string, deconstructOptions?: DeconstructOptions | undefined) => { urlParams: {} & {}; queryParams: { requiredQ: readonly string[]; } & { optionalQ?: readonly string[] | undefined; }; }
     const deconstruct2 = url2.deconstruct;
 
     expect(deconstruct2('/api/example?requiredQ=a,b')).toEqual({
@@ -387,7 +387,7 @@ describe('params', () => {
       ],
     });
 
-    // @tsassert: (urlParams: {} & {} & {} & {} & {} & {} & {}, queryParams: {} & {} & {} & {} & {} & {} & {} & { requiredQ: readonly number[]; } & {} & {} & { optionalQ?: readonly number[] | undefined; } & {}) => string
+    // @tsassert: (urlParams: {} & {}, queryParams: { requiredQ: readonly number[]; } & { optionalQ?: readonly number[] | undefined; }) => string
     const constructPath1 = url1.constructPath;
 
     expect(constructPath1({}, { requiredQ: [1, 2] })).toBe(
@@ -397,7 +397,7 @@ describe('params', () => {
       '/api/example?optionalQ=3&optionalQ=4&requiredQ=1&requiredQ=2'
     );
 
-    // @tsassert: (url: string) => { urlParams: {} & {} & {} & {} & {} & {} & {}; queryParams: {} & {} & {} & {} & {} & {} & {} & { requiredQ: readonly number[]; } & {} & {} & { optionalQ?: readonly number[] | undefined; } & {}; }
+    // @tsassert: (url: string, deconstructOptions?: DeconstructOptions | undefined) => { urlParams: {} & {}; queryParams: { requiredQ: readonly number[]; } & { optionalQ?: readonly number[] | undefined; }; }
     const deconstruct1 = url1.deconstruct;
 
     expect(deconstruct1('/api/example?requiredQ=1&requiredQ=2')).toEqual({
@@ -427,7 +427,7 @@ describe('params', () => {
       queryArrayFormat: 'comma',
     });
 
-    // @tsassert: (urlParams: {} & {} & {} & {} & {} & {} & {}, queryParams: {} & {} & {} & {} & {} & {} & {} & { requiredQ: readonly number[]; } & {} & {} & { optionalQ?: readonly number[] | undefined; } & {}) => string
+    // @tsassert: (urlParams: {} & {}, queryParams: { requiredQ: readonly number[]; } & { optionalQ?: readonly number[] | undefined; }) => string
     const constructPath2 = url2.constructPath;
 
     expect(constructPath2({}, { requiredQ: [1, 2] })).toBe(
@@ -437,7 +437,7 @@ describe('params', () => {
       '/api/example?optionalQ=3,4&requiredQ=1,2'
     );
 
-    // @tsassert: (url: string) => { urlParams: {} & {} & {} & {} & {} & {} & {}; queryParams: {} & {} & {} & {} & {} & {} & {} & { requiredQ: readonly number[]; } & {} & {} & { optionalQ?: readonly number[] | undefined; } & {}; }
+    // @tsassert: (url: string, deconstructOptions?: DeconstructOptions | undefined) => { urlParams: {} & {}; queryParams: { requiredQ: readonly number[]; } & { optionalQ?: readonly number[] | undefined; }; }
     const deconstruct2 = url2.deconstruct;
 
     expect(deconstruct2('/api/example?requiredQ=1,2')).toEqual({
@@ -464,7 +464,7 @@ describe('params', () => {
       ],
     });
 
-    // @tsassert: (urlParams: {} & {} & {} & {} & {} & {} & {}, queryParams: {} & {} & {} & {} & {} & {} & {} & {} & { requiredQ: readonly boolean[]; } & {} & {} & { optionalQ?: readonly boolean[] | undefined; }) => string
+    // @tsassert: (urlParams: {} & {}, queryParams: { requiredQ: readonly boolean[]; } & { optionalQ?: readonly boolean[] | undefined; }) => string
     const constructPath1 = url1.constructPath;
 
     expect(constructPath1({}, { requiredQ: [true, false] })).toBe(
@@ -476,7 +476,7 @@ describe('params', () => {
       '/api/example?optionalQ=true&optionalQ=false&requiredQ=true&requiredQ=false'
     );
 
-    // @tsassert: (url: string) => { urlParams: {} & {} & {} & {} & {} & {} & {}; queryParams: {} & {} & {} & {} & {} & {} & {} & {} & { requiredQ: readonly boolean[]; } & {} & {} & { optionalQ?: readonly boolean[] | undefined; }; }
+    // @tsassert: (url: string, deconstructOptions?: DeconstructOptions | undefined) => { urlParams: {} & {}; queryParams: { requiredQ: readonly boolean[]; } & { optionalQ?: readonly boolean[] | undefined; }; }
     const deconstruct1 = url1.deconstruct;
 
     expect(deconstruct1('/api/example?requiredQ=true&requiredQ=false')).toEqual(
@@ -508,7 +508,7 @@ describe('params', () => {
       queryArrayFormat: 'comma',
     });
 
-    // @tsassert: (urlParams: {} & {} & {} & {} & {} & {} & {}, queryParams: {} & {} & {} & {} & {} & {} & {} & {} & { requiredQ: readonly boolean[]; } & {} & {} & { optionalQ?: readonly boolean[] | undefined; }) => string
+    // @tsassert: (urlParams: {} & {}, queryParams: { requiredQ: readonly boolean[]; } & { optionalQ?: readonly boolean[] | undefined; }) => string
     const constructPath2 = url2.constructPath;
 
     expect(constructPath2({}, { requiredQ: [true, false] })).toBe(
@@ -518,7 +518,7 @@ describe('params', () => {
       constructPath2({}, { requiredQ: [true, false], optionalQ: [true, false] })
     ).toBe('/api/example?optionalQ=true,false&requiredQ=true,false');
 
-    // @tsassert: (url: string) => { urlParams: {} & {} & {} & {} & {} & {} & {}; queryParams: {} & {} & {} & {} & {} & {} & {} & {} & { requiredQ: readonly boolean[]; } & {} & {} & { optionalQ?: readonly boolean[] | undefined; }; }
+    // @tsassert: (url: string, deconstructOptions?: DeconstructOptions | undefined) => { urlParams: {} & {}; queryParams: { requiredQ: readonly boolean[]; } & { optionalQ?: readonly boolean[] | undefined; }; }
     const deconstruct2 = url2.deconstruct;
 
     expect(deconstruct2('/api/example?requiredQ=true,false')).toEqual({
