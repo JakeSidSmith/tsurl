@@ -193,6 +193,26 @@ url.deconstruct('https://server.com/user/123/posts/123');
 // returns { urlParams: { userId: '123', splat: ['posts', '123'] }, queryParams: {} }
 ```
 
+## Allow sub-paths when you don't want to match a splat
+
+In some cases you want your URL templates to match a specific template, but when deconstructing you don't mind if the URL/path contains additional sub-paths. In these cases you can pass the `allowSubPaths` option to the deconstruct method.
+
+```ts
+const url = createTSURL(['user', requiredString('userId')], {
+  baseUrl: 'https://server.com',
+  basePath: '/api',
+  trailingSlash: false,
+});
+
+url.deconstruct('https://server.com/user/123/posts/123');
+// throws an error
+
+url.deconstruct('https://server.com/user/123/posts/123', {
+  allowSubPaths: true,
+});
+// returns { urlParams: { userId: '123' }, queryParams: {} }
+```
+
 ## API
 
 ### createTSURL
