@@ -144,7 +144,6 @@ export type InferQueryParams<Q extends QueryParamsSchema = readonly never[]> =
           | OptionalStringArray<infer Name>
           | OptionalNumberArray<infer Name>
           | OptionalBooleanArray<infer Name>
-          | Splat<infer Name>
           ? Name
           : never]?: V extends OptionalString<string>
           ? string
@@ -152,8 +151,6 @@ export type InferQueryParams<Q extends QueryParamsSchema = readonly never[]> =
           ? number
           : V extends OptionalBoolean<string>
           ? boolean
-          : V extends Splat<string>
-          ? readonly string[]
           : V extends OptionalStringArray<string>
           ? readonly string[]
           : V extends OptionalNumberArray<string>
