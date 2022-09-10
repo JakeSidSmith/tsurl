@@ -98,14 +98,15 @@ export class TSURL<
     const pathTemplate = constructPathAndMaybeEncode(
       this.getURLParams(),
       this.schema,
-      this.options,
-      deconstructOptions
+      this.options
     );
     const parsed = urlParse(this.options.decode ? decodeUrl(url) : url, false);
 
     const urlMatch = match<
       Record<string, string | undefined | null | readonly string[]>
-    >(pathTemplate)(parsed.pathname);
+    >(pathTemplate, {
+      end: !deconstructOptions?.allowSubPaths,
+    })(parsed.pathname);
 
     if (!urlMatch) {
       throw new Error(

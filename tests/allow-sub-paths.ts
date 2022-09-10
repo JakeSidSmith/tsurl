@@ -20,6 +20,16 @@ describe('allowSubPaths', () => {
       },
       queryParams: {},
     });
+    expect(
+      url1.deconstruct('https://example.com/api/user/123', {
+        allowSubPaths: true,
+      })
+    ).toEqual({
+      urlParams: {
+        userId: '123',
+      },
+      queryParams: {},
+    });
 
     const url2 = createTSURL(['user', requiredString('userId')], {
       baseURL: 'https://example.com',
