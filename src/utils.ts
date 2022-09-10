@@ -25,6 +25,7 @@ import {
 } from './params';
 import {
   AnyPart,
+  DeconstructOptions,
   InferQueryParams,
   InferURLParams,
   QueryParamsSchema,
@@ -34,7 +35,7 @@ import {
 
 export const serializeValue = <T extends string>(
   part: AnyPart<T>,
-  value: string | undefined | ReadonlyArray<string>
+  value: string | undefined | readonly string[]
 ) => {
   if (part instanceof RequiredString && typeof value === 'string') {
     return value;
@@ -176,7 +177,7 @@ export const serializeValue = <T extends string>(
 export const serializeURLParams = <
   S extends URLParamsSchema = readonly never[]
 >(
-  params: Record<string, string | undefined | null | ReadonlyArray<string>>,
+  params: Record<string, string | undefined | null | readonly string[]>,
   schema: S
 ) => {
   const serializedParams: Record<
@@ -212,7 +213,7 @@ export const serializeURLParams = <
 export const serializeQueryParams = <
   Q extends QueryParamsSchema = readonly never[]
 >(
-  params: Record<string, string | undefined | null | ReadonlyArray<string>>,
+  params: Record<string, string | undefined | null | readonly string[]>,
   schema: Q
 ) => {
   const serializedParams: Record<
@@ -246,7 +247,8 @@ export const serializeQueryParams = <
 export const constructPath = <S extends URLParamsSchema = readonly never[]>(
   urlParams: Record<string, string | boolean | number | readonly string[]>,
   urlParamsSchema: S,
-  options: Omit<TSURLOptions<readonly never[]>, 'queryParams'>
+  options: Omit<TSURLOptions<readonly never[]>, 'queryParams'>,
+  deconstructOptions?: DeconstructOptions
 ) => {
   const { trailingSlash, normalize } = options;
 
@@ -286,6 +288,14 @@ export const constructPath = <S extends URLParamsSchema = readonly never[]>(
     path = path.replace(MATCHES_MAYBE_TRAILING_SLASH, '');
   }
 
+  if (deconstructOptions?.allowSubPaths === true) {
+    if (trailingSlash === true) {
+      path = `${path}(.*)`;
+    } else {
+      path = `${path}/(.*)`;
+    }
+  }
+
   return path;
 };
 
@@ -294,11 +304,17 @@ export const constructPathAndMaybeEncode = <
 >(
   urlParams: Record<string, string | boolean | number>,
   urlParamsSchema: S,
-  options: Omit<TSURLOptions<readonly never[]>, 'queryParams'>
+  options: Omit<TSURLOptions<readonly never[]>, 'queryParams'>,
+  deconstructOptions?: DeconstructOptions
 ) => {
   const { encode } = options;
 
-  let path = constructPath(urlParams, urlParamsSchema, options);
+  let path = constructPath(
+    urlParams,
+    urlParamsSchema,
+    options,
+    deconstructOptions
+  );
 
   if (encode === true) {
     path = encodeurl(path);
@@ -346,14 +362,14 @@ export const constructQuery = <Q extends QueryParamsSchema = readonly never[]>(
     | readonly boolean[]
     | readonly number[]
   >,
-  queryParamsShema: Q,
+  queryParamsSchema: Q,
   options: TSURLOptions<Q>
 ) => {
   const { encode, queryArrayFormat, queryArrayFormatSeparator } = options;
 
   const filteredQueryParams: Record<string, unknown> = {};
 
-  queryParamsShema.forEach((part) => {
+  queryParamsSchema.forEach((part) => {
     const value = queryParams[part.name];
 
     if (typeof value !== 'undefined') {

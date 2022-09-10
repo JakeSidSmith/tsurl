@@ -36,7 +36,7 @@ export type AnyPart<T extends string> =
   | OptionalPart<T>
   | Splat<T>;
 
-export type URLParamsSchema = ReadonlyArray<
+export type URLParamsSchema = readonly (
   | string
   | RequiredString<string>
   | RequiredNumber<string>
@@ -45,9 +45,9 @@ export type URLParamsSchema = ReadonlyArray<
   | OptionalNumber<string>
   | OptionalBoolean<string>
   | Splat<string>
->;
+)[];
 
-export type QueryParamsSchema = ReadonlyArray<
+export type QueryParamsSchema = readonly (
   | RequiredString<string>
   | RequiredNumber<string>
   | RequiredBoolean<string>
@@ -60,7 +60,7 @@ export type QueryParamsSchema = ReadonlyArray<
   | OptionalStringArray<string>
   | OptionalNumberArray<string>
   | OptionalBooleanArray<string>
->;
+)[];
 
 export interface TSURLOptions<Q extends QueryParamsSchema> {
   baseURL?: string;
@@ -74,62 +74,89 @@ export interface TSURLOptions<Q extends QueryParamsSchema> {
   queryParams?: Q;
 }
 
+export interface DeconstructOptions {
+  allowSubPaths?: boolean;
+}
+
 export type InferURLParams<S extends URLParamsSchema = readonly never[]> =
   S extends readonly (infer V)[]
     ? {
-        [P in V extends RequiredString<infer Name> ? Name : never]: string;
+        [P in V extends
+          | RequiredString<infer Name>
+          | RequiredNumber<infer Name>
+          | RequiredBoolean<infer Name>
+          ? Name
+          : never]: V extends RequiredString<string>
+          ? string
+          : V extends RequiredNumber<string>
+          ? number
+          : V extends RequiredBoolean<string>
+          ? boolean
+          : never;
       } & {
-        [P in V extends RequiredNumber<infer Name> ? Name : never]: number;
-      } & {
-        [P in V extends RequiredBoolean<infer Name> ? Name : never]: boolean;
-      } & {
-        [P in V extends OptionalString<infer Name> ? Name : never]?: string;
-      } & {
-        [P in V extends OptionalNumber<infer Name> ? Name : never]?: number;
-      } & {
-        [P in V extends OptionalBoolean<infer Name> ? Name : never]?: boolean;
-      } & {
-        [P in V extends Splat<infer Name> ? Name : never]?: readonly string[];
+        [P in V extends
+          | OptionalString<infer Name>
+          | OptionalNumber<infer Name>
+          | OptionalBoolean<infer Name>
+          | Splat<infer Name>
+          ? Name
+          : never]?: V extends OptionalString<string>
+          ? string
+          : V extends OptionalNumber<string>
+          ? number
+          : V extends OptionalBoolean<string>
+          ? boolean
+          : V extends Splat<string>
+          ? readonly string[]
+          : never;
       }
     : never;
 
 export type InferQueryParams<Q extends QueryParamsSchema = readonly never[]> =
   Q extends readonly (infer V)[]
     ? {
-        [P in V extends RequiredString<infer Name> ? Name : never]: string;
-      } & {
-        [P in V extends RequiredNumber<infer Name> ? Name : never]: number;
-      } & {
-        [P in V extends RequiredBoolean<infer Name> ? Name : never]: boolean;
-      } & {
-        [P in V extends OptionalString<infer Name> ? Name : never]?: string;
-      } & {
-        [P in V extends OptionalNumber<infer Name> ? Name : never]?: number;
-      } & {
-        [P in V extends OptionalBoolean<infer Name> ? Name : never]?: boolean;
-      } & {
-        [P in V extends RequiredStringArray<infer Name>
+        [P in V extends
+          | RequiredString<infer Name>
+          | RequiredNumber<infer Name>
+          | RequiredBoolean<infer Name>
+          | RequiredStringArray<infer Name>
+          | RequiredNumberArray<infer Name>
+          | RequiredBooleanArray<infer Name>
           ? Name
-          : never]: readonly string[];
+          : never]: V extends RequiredString<string>
+          ? string
+          : V extends RequiredNumber<string>
+          ? number
+          : V extends RequiredBoolean<string>
+          ? boolean
+          : V extends RequiredStringArray<string>
+          ? readonly string[]
+          : V extends RequiredNumberArray<string>
+          ? readonly number[]
+          : V extends RequiredBooleanArray<string>
+          ? readonly boolean[]
+          : never;
       } & {
-        [P in V extends RequiredNumberArray<infer Name>
+        [P in V extends
+          | OptionalString<infer Name>
+          | OptionalNumber<infer Name>
+          | OptionalBoolean<infer Name>
+          | OptionalStringArray<infer Name>
+          | OptionalNumberArray<infer Name>
+          | OptionalBooleanArray<infer Name>
           ? Name
-          : never]: readonly number[];
-      } & {
-        [P in V extends RequiredBooleanArray<infer Name>
-          ? Name
-          : never]: readonly boolean[];
-      } & {
-        [P in V extends OptionalStringArray<infer Name>
-          ? Name
-          : never]?: readonly string[];
-      } & {
-        [P in V extends OptionalNumberArray<infer Name>
-          ? Name
-          : never]?: readonly number[];
-      } & {
-        [P in V extends OptionalBooleanArray<infer Name>
-          ? Name
-          : never]?: readonly boolean[];
+          : never]?: V extends OptionalString<string>
+          ? string
+          : V extends OptionalNumber<string>
+          ? number
+          : V extends OptionalBoolean<string>
+          ? boolean
+          : V extends OptionalStringArray<string>
+          ? readonly string[]
+          : V extends OptionalNumberArray<string>
+          ? readonly number[]
+          : V extends OptionalBooleanArray<string>
+          ? readonly boolean[]
+          : never;
       }
     : never;

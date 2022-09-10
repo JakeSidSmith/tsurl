@@ -11,10 +11,10 @@ describe('splat', () => {
       }
     );
 
-    // @tsassert: (urlParams: { userId: string; } & {} & {} & {} & {} & {} & { splat?: readonly string[] | undefined; }, queryParams: {} & {} & {} & {} & {} & {} & {} & {} & {} & {} & {} & {}) => string
+    // @tsassert: (urlParams: { userId: string; } & { splat?: readonly string[] | undefined; }, queryParams: {} & {}) => string
     const constructPath = url.constructPath;
 
-    // @tsassert: (url: string) => { urlParams: { userId: string; } & {} & {} & {} & {} & {} & { splat?: readonly string[] | undefined; }; queryParams: {} & {} & {} & {} & {} & {} & {} & {} & {} & {} & {} & {}; }
+    // @tsassert: (url: string, deconstructOptions?: DeconstructOptions | undefined) => { urlParams: { userId: string; } & { splat?: readonly string[] | undefined; }; queryParams: {} & {}; }
     const deconstruct = url.deconstruct;
 
     expect(constructPath({ userId: '123' }, {})).toBe('/api/user/123');

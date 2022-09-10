@@ -6,6 +6,7 @@ import urlParse from 'url-parse';
 import { DEFAULT_OPTIONS } from './constants';
 import { PartType } from './params';
 import {
+  DeconstructOptions,
   InferQueryParams,
   InferURLParams,
   QueryParamsSchema,
@@ -90,12 +91,20 @@ export class TSURL<
     return `${url}${this.constructQuery(queryParams)}`;
   };
 
-  public deconstruct = (url: string) => {
-    const pathTemplate = this.getPathTemplate();
+  public deconstruct = (
+    url: string,
+    deconstructOptions?: DeconstructOptions
+  ) => {
+    const pathTemplate = constructPathAndMaybeEncode(
+      this.getURLParams(),
+      this.schema,
+      this.options,
+      deconstructOptions
+    );
     const parsed = urlParse(this.options.decode ? decodeUrl(url) : url, false);
 
     const urlMatch = match<
-      Record<string, string | undefined | null | ReadonlyArray<string>>
+      Record<string, string | undefined | null | readonly string[]>
     >(pathTemplate)(parsed.pathname);
 
     if (!urlMatch) {

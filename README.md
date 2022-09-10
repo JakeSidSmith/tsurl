@@ -56,7 +56,7 @@ This outputs a path with the same syntax as required by `react-router`.
 Now, if you wanted to navigate to this URL you'd probably previously have used string concatenation, a template string, or `path-to-regexp` to construct the path, but none of these offer type safety. Instead now you can use your TSURL instance to construct a path. It will enforce that you provide a string for the user's ID.
 
 ```ts
-const whereWeWantToGo = userDetailURL.construct({ id: 'abc' }, {});
+const whereWeWantToGo = userDetailURL.constructPath({ id: 'abc' }, {});
 ```
 
 This will output `/users/abc/` exactly as we'd expect, but would fail type checks if the `id` key was missing from the URL parameters object. The second argument is the query params object, but since we don't need any, we've just provided an empty object. Note: this method will throw an error if you somehow fail to supply the user id e.g. not using type checking, or cast your params to `any`.
@@ -88,11 +88,11 @@ const userListURL = createTSURL(['/users'], {
 Here we've constructed a TSURL instance that will not only enforce that we provide a number (or nothing as we may not want to define the page number for the first page) when constructing a URL for this route, but also will give us sensible types for the parameters when deconstructing.
 
 ```ts
-userListURL.construct({}, {}); // Is fine because page is optional
-userListURL.construct({}, { page: 2 }); // Is fine because page should be a number
+userListURL.constructPath({}, {}); // Is fine because page is optional
+userListURL.constructPath({}, { page: 2 }); // Is fine because page should be a number
 
-userListURL.construct({}, { page: '2' }); // Disallowed by types (would error)
-userListURL.construct({}, { page: null }); // Disallowed by types (would error)
+userListURL.constructPath({}, { page: '2' }); // Disallowed by types (would error)
+userListURL.constructPath({}, { page: null }); // Disallowed by types (would error)
 
 // The below deconstruct will handle casting the page query param to a number if found
 userListURL.deconstruct(window.location.href);
@@ -137,7 +137,7 @@ url.getPathTemplate();
 // /api/users/:userId
 url.constructURL({ userId: 'abc' }, {});
 // https://domain.com/api/users/abc
-url.constructPath();
+url.constructPath({ userId: 'abc' }, {});
 // /api/users/abc
 ```
 
@@ -186,11 +186,31 @@ url.constructPath({ userId: 'abc' }, {});
 url.constructPath({ userId: 'abc', splat: ['posts', '123'] }, {});
 // returns '/api/user/abc/posts/123'
 
-url.deconstruct('https://server.com/user/abc');
+url.deconstruct('https://server.com/api/user/abc');
 // returns { urlParams: { userId: 'abc', splat: undefined }, queryParams: {} }
 
-url.deconstruct('https://server.com/user/123/posts/123');
+url.deconstruct('https://server.com/api/user/123/posts/123');
 // returns { urlParams: { userId: '123', splat: ['posts', '123'] }, queryParams: {} }
+```
+
+## Allow sub-paths when you don't want to match a splat
+
+In some cases you want your URL templates to match a specific template, but when deconstructing you don't mind if the URL/path contains additional sub-paths. In these cases you can pass the `allowSubPaths` option to the deconstruct method.
+
+```ts
+const url = createTSURL(['user', requiredString('userId')], {
+  baseUrl: 'https://server.com',
+  basePath: '/api',
+  trailingSlash: false,
+});
+
+url.deconstruct('https://server.com/api/user/123/posts/123');
+// throws an error
+
+url.deconstruct('https://server.com/api/user/123/posts/123', {
+  allowSubPaths: true,
+});
+// returns { urlParams: { userId: '123' }, queryParams: {} }
 ```
 
 ## API
@@ -266,9 +286,10 @@ Note: this method will throw an error if you have not supplied required query pa
 
 Returns the URL and query params extracted from a string URL/path.
 
-This takes a single argument:
+This takes 1 or 2 arguments:
 
 - URL/path - `string` - the URL you wish to extract parameters from
+- An options object (optional) - `Options` - see [Deconstruct Options](#deconstructoptions) for more info
 
 Returns an object with `urlParams` and `queryParams` keys. Both of these keys will be objects containing the parameters you defined in your schema e.g.
 
@@ -302,6 +323,14 @@ Options include:
 - `queryArrayFormat` - how to handle constructing/deconstructing query params that can have multiple values. This option is defined by the `query-string` package.
 - `queryArrayFormatSeparator` - `string` - the separator to use when `queryArrayFormat` is set to `separator`. Defaults to `,`.
 - `queryParams` - an array of [parameters](#parameters).
+
+### Deconstruct Options
+
+This is the second argument to the `deconstruct` function.
+
+Options include:
+
+- `allowSubPaths` - `boolean` - whether the deconstruction will allow sub-paths (stuff that appears after your defined template) in the provided URL/path
 
 ### Parameters
 
