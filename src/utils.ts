@@ -25,7 +25,6 @@ import {
 } from './params';
 import {
   AnyPart,
-  DeconstructOptions,
   InferQueryParams,
   InferURLParams,
   QueryParamsSchema,
@@ -247,8 +246,7 @@ export const serializeQueryParams = <
 export const constructPath = <S extends URLParamsSchema = readonly never[]>(
   urlParams: Record<string, string | boolean | number | readonly string[]>,
   urlParamsSchema: S,
-  options: Omit<TSURLOptions<readonly never[]>, 'queryParams'>,
-  deconstructOptions?: DeconstructOptions
+  options: Omit<TSURLOptions<readonly never[]>, 'queryParams'>
 ) => {
   const { trailingSlash, normalize } = options;
 
@@ -288,14 +286,6 @@ export const constructPath = <S extends URLParamsSchema = readonly never[]>(
     path = path.replace(MATCHES_MAYBE_TRAILING_SLASH, '');
   }
 
-  if (deconstructOptions?.allowSubPaths === true) {
-    if (trailingSlash === true) {
-      path = `${path}(.*)`;
-    } else {
-      path = `${path}/(.*)`;
-    }
-  }
-
   return path;
 };
 
@@ -304,17 +294,11 @@ export const constructPathAndMaybeEncode = <
 >(
   urlParams: Record<string, string | boolean | number>,
   urlParamsSchema: S,
-  options: Omit<TSURLOptions<readonly never[]>, 'queryParams'>,
-  deconstructOptions?: DeconstructOptions
+  options: Omit<TSURLOptions<readonly never[]>, 'queryParams'>
 ) => {
   const { encode } = options;
 
-  let path = constructPath(
-    urlParams,
-    urlParamsSchema,
-    options,
-    deconstructOptions
-  );
+  let path = constructPath(urlParams, urlParamsSchema, options);
 
   if (encode === true) {
     path = encodeurl(path);
