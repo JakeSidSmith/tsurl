@@ -86,11 +86,11 @@ export type InferURLParams<S extends URLParamsSchema = readonly never[]> =
           | RequiredNumber<infer Name>
           | RequiredBoolean<infer Name>
           ? Name
-          : never]: V extends RequiredString<string>
+          : never]: V extends RequiredString<P>
           ? string
-          : V extends RequiredNumber<string>
+          : V extends RequiredNumber<P>
           ? number
-          : V extends RequiredBoolean<string>
+          : V extends RequiredBoolean<P>
           ? boolean
           : never;
       } & {
@@ -100,11 +100,11 @@ export type InferURLParams<S extends URLParamsSchema = readonly never[]> =
           | OptionalBoolean<infer Name>
           | Splat<infer Name>
           ? Name
-          : never]?: V extends OptionalString<string>
+          : never]?: V extends OptionalString<P>
           ? string
-          : V extends OptionalNumber<string>
+          : V extends OptionalNumber<P>
           ? number
-          : V extends OptionalBoolean<string>
+          : V extends OptionalBoolean<P>
           ? boolean
           : V extends Splat<string>
           ? readonly string[]
@@ -123,17 +123,17 @@ export type InferQueryParams<Q extends QueryParamsSchema = readonly never[]> =
           | RequiredNumberArray<infer Name>
           | RequiredBooleanArray<infer Name>
           ? Name
-          : never]: V extends RequiredString<string>
+          : never]: V extends RequiredString<P>
           ? string
-          : V extends RequiredNumber<string>
+          : V extends RequiredNumber<P>
           ? number
-          : V extends RequiredBoolean<string>
+          : V extends RequiredBoolean<P>
           ? boolean
-          : V extends RequiredStringArray<string>
+          : V extends RequiredStringArray<P>
           ? readonly string[]
-          : V extends RequiredNumberArray<string>
+          : V extends RequiredNumberArray<P>
           ? readonly number[]
-          : V extends RequiredBooleanArray<string>
+          : V extends RequiredBooleanArray<P>
           ? readonly boolean[]
           : never;
       } & {
@@ -145,17 +145,17 @@ export type InferQueryParams<Q extends QueryParamsSchema = readonly never[]> =
           | OptionalNumberArray<infer Name>
           | OptionalBooleanArray<infer Name>
           ? Name
-          : never]?: V extends OptionalString<string>
+          : never]?: V extends OptionalString<P>
           ? string
-          : V extends OptionalNumber<string>
+          : V extends OptionalNumber<P>
           ? number
-          : V extends OptionalBoolean<string>
+          : V extends OptionalBoolean<P>
           ? boolean
-          : V extends OptionalStringArray<string>
+          : V extends OptionalStringArray<P>
           ? readonly string[]
-          : V extends OptionalNumberArray<string>
+          : V extends OptionalNumberArray<P>
           ? readonly number[]
-          : V extends OptionalBooleanArray<string>
+          : V extends OptionalBooleanArray<P>
           ? readonly boolean[]
           : never;
       }
