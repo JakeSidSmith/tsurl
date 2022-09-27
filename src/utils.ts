@@ -10,6 +10,8 @@ import {
 import {
   OptionalBoolean,
   OptionalBooleanArray,
+  OptionalEnum,
+  OptionalEnumArray,
   OptionalNumber,
   OptionalNumberArray,
   OptionalString,
@@ -17,6 +19,8 @@ import {
   PartType,
   RequiredBoolean,
   RequiredBooleanArray,
+  RequiredEnum,
+  RequiredEnumArray,
   RequiredNumber,
   RequiredNumberArray,
   RequiredString,
@@ -81,6 +85,19 @@ export const serializeValue = <T extends string>(
     }
 
     if (typeof value === 'undefined') {
+      return value;
+    }
+  }
+
+  if (part instanceof RequiredEnum || part instanceof OptionalEnum) {
+    const validValues = Array.isArray(part.valid)
+      ? part.valid
+      : Object.values(part.valid);
+    return part.valid;
+    if (
+      validValues.includes(value) ||
+      (part instanceof OptionalEnum && typeof value === 'undefined')
+    ) {
       return value;
     }
   }
@@ -159,6 +176,23 @@ export const serializeValue = <T extends string>(
       return value;
     }
   }
+
+  // if (
+  //   part instanceof RequiredEnumArray &&
+  //   (typeof value === 'string' || Array.isArray(value))
+  // ) {
+  //   return ([] as readonly string[]).concat(value).map((sub) => {
+  //     if (sub === 'true') {
+  //       return true;
+  //     }
+
+  //     if (sub === 'false') {
+  //       return false;
+  //     }
+
+  //     throw new Error(`Invalid value for part "${part.name}" - ${value}`);
+  //   });
+  // }
 
   if (part instanceof Splat) {
     if (typeof value === 'string' || Array.isArray(value)) {
