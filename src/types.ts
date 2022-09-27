@@ -2,8 +2,8 @@ import type { ParseOptions } from 'query-string';
 import type {
   OptionalBoolean,
   OptionalBooleanArray,
-  // OptionalEnum,
-  // OptionalEnumArray,
+  OptionalEnum,
+  OptionalEnumArray,
   OptionalNumber,
   OptionalNumberArray,
   OptionalString,
@@ -11,7 +11,7 @@ import type {
   RequiredBoolean,
   RequiredBooleanArray,
   RequiredEnum,
-  // RequiredEnumArray,
+  RequiredEnumArray,
   RequiredNumber,
   RequiredNumberArray,
   RequiredString,
@@ -32,18 +32,18 @@ export type RequiredPart<T extends string> =
   | RequiredEnum<T, EnumValue>
   | RequiredStringArray<T>
   | RequiredNumberArray<T>
-  | RequiredBooleanArray<T>;
-// | RequiredEnumArray<T, EnumValue>;
+  | RequiredBooleanArray<T>
+  | RequiredEnumArray<T, EnumValue>;
 
 export type OptionalPart<T extends string> =
   | OptionalString<T>
   | OptionalNumber<T>
   | OptionalBoolean<T>
-  // | OptionalEnum<T, EnumValue>
+  | OptionalEnum<T, EnumValue>
   | OptionalStringArray<T>
   | OptionalNumberArray<T>
-  | OptionalBooleanArray<T>;
-// | OptionalEnumArray<T, EnumValue>;
+  | OptionalBooleanArray<T>
+  | OptionalEnumArray<T, EnumValue>;
 
 export type AnyPart<T extends string> =
   | RequiredPart<T>
@@ -59,7 +59,7 @@ export type URLParamsSchema = readonly (
   | OptionalString<string>
   | OptionalNumber<string>
   | OptionalBoolean<string>
-  // | OptionalEnum<string, any>
+  | OptionalEnum<string, EnumValue>
   | Splat<string>
 )[];
 
@@ -71,16 +71,16 @@ export type QueryParamsSchema = readonly (
   | RequiredStringArray<string>
   | RequiredNumberArray<string>
   | RequiredBooleanArray<string>
-  // | RequiredEnumArray<string, EnumValue>
+  | RequiredEnumArray<string, EnumValue>
   | OptionalString<string>
   | OptionalNumber<string>
   | OptionalBoolean<string>
-  // | OptionalEnum<string, EnumValue>
+  | OptionalEnum<string, EnumValue>
   | OptionalStringArray<string>
   | OptionalNumberArray<string>
   | OptionalBooleanArray<string>
+  | OptionalEnumArray<string, EnumValue>
 )[];
-// | OptionalEnumArray<string, EnumValue>
 
 export interface TSURLOptions<Q extends QueryParamsSchema> {
   baseURL?: string;
@@ -94,8 +94,12 @@ export interface TSURLOptions<Q extends QueryParamsSchema> {
   queryParams?: Q;
 }
 
-export interface DeconstructOptions {
-  allowSubPaths?: boolean;
+export interface SerializeValueOptions {
+  ignoreInvalidEnums?: boolean;
+}
+
+export interface DeconstructOptions extends SerializeValueOptions {
+  ignoreSubPaths?: boolean;
 }
 
 export type InferURLParams<S extends URLParamsSchema = readonly never[]> =
@@ -121,7 +125,7 @@ export type InferURLParams<S extends URLParamsSchema = readonly never[]> =
           | OptionalString<infer Name>
           | OptionalNumber<infer Name>
           | OptionalBoolean<infer Name>
-          // | OptionalEnum<infer Name, any>
+          | OptionalEnum<infer Name, EnumValue>
           | Splat<infer Name>
           ? Name
           : never]?: V extends OptionalString<P>
@@ -130,9 +134,9 @@ export type InferURLParams<S extends URLParamsSchema = readonly never[]> =
           ? number
           : V extends OptionalBoolean<P>
           ? boolean
-          : // : V extends OptionalEnum<P, infer Value>
-          // ? InferEnumOrArrayValue<Value>
-          V extends Splat<P>
+          : V extends OptionalEnum<P, infer Value>
+          ? Value
+          : V extends Splat<P>
           ? readonly string[]
           : never;
       }
@@ -149,8 +153,8 @@ export type InferQueryParams<Q extends QueryParamsSchema = readonly never[]> =
           | RequiredStringArray<infer Name>
           | RequiredNumberArray<infer Name>
           | RequiredBooleanArray<infer Name>
-          ? // | RequiredEnumArray<infer Name, any>
-            Name
+          | RequiredEnumArray<infer Name, EnumValue>
+          ? Name
           : never]: V extends RequiredString<P>
           ? string
           : V extends RequiredNumber<P>
@@ -165,38 +169,36 @@ export type InferQueryParams<Q extends QueryParamsSchema = readonly never[]> =
           ? readonly number[]
           : V extends RequiredBooleanArray<P>
           ? readonly boolean[]
-          : // Another RequiredEnum?
-            // : V extends RequiredEnum<P, infer Value>
-            // ? InferEnumOrArrayValue<Value>[]
-            never;
+          : V extends RequiredEnumArray<P, infer Value>
+          ? Value[]
+          : never;
       } & {
         [P in V extends
           | OptionalString<infer Name>
           | OptionalNumber<infer Name>
           | OptionalBoolean<infer Name>
-          // | OptionalEnum<infer Name, any>
+          | OptionalEnum<infer Name, EnumValue>
           | OptionalStringArray<infer Name>
           | OptionalNumberArray<infer Name>
           | OptionalBooleanArray<infer Name>
-          ? // | OptionalEnumArray<infer Name, any>
-            Name
+          | OptionalEnumArray<infer Name, EnumValue>
+          ? Name
           : never]?: V extends OptionalString<P>
           ? string
           : V extends OptionalNumber<P>
           ? number
           : V extends OptionalBoolean<P>
           ? boolean
-          : // : V extends OptionalEnum<P, infer Value>
-          // ? InferEnumOrArrayValue<Value>
-          V extends OptionalStringArray<P>
+          : V extends OptionalEnum<P, infer Value>
+          ? Value
+          : V extends OptionalStringArray<P>
           ? readonly string[]
           : V extends OptionalNumberArray<P>
           ? readonly number[]
           : V extends OptionalBooleanArray<P>
           ? readonly boolean[]
-          : // Another OptionalEnum?
-            // : V extends OptionalEnum<P, infer Value>
-            // ? InferEnumOrArrayValue<Value>[]
-            never;
+          : V extends OptionalEnumArray<P, infer Value>
+          ? Value[]
+          : never;
       }
     : never;

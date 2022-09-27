@@ -1,6 +1,6 @@
 import createTSURL, { requiredString } from '../src';
 
-describe('allowSubPaths', () => {
+describe('ignoreSubPaths', () => {
   it('should allow deconstructing a URL or path that matches the schema, but with additional sub-paths', () => {
     const url1 = createTSURL(['user', requiredString('userId')], {
       baseURL: 'https://example.com',
@@ -12,7 +12,7 @@ describe('allowSubPaths', () => {
     ).toThrow(/invalid\sfor\stemplate/);
     expect(
       url1.deconstruct('https://example.com/api/user/123/posts/456', {
-        allowSubPaths: true,
+        ignoreSubPaths: true,
       })
     ).toEqual({
       urlParams: {
@@ -22,7 +22,7 @@ describe('allowSubPaths', () => {
     });
     expect(
       url1.deconstruct('https://example.com/api/user/123', {
-        allowSubPaths: true,
+        ignoreSubPaths: true,
       })
     ).toEqual({
       urlParams: {
@@ -42,7 +42,7 @@ describe('allowSubPaths', () => {
     ).toThrow(/invalid\sfor\stemplate/);
     expect(
       url2.deconstruct('https://example.com/api/user/123/posts/456', {
-        allowSubPaths: true,
+        ignoreSubPaths: true,
       })
     ).toEqual({
       urlParams: {

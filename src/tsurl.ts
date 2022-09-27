@@ -10,6 +10,7 @@ import {
   InferQueryParams,
   InferURLParams,
   QueryParamsSchema,
+  SerializeValueOptions,
   TSURLOptions,
   URLParamsSchema,
 } from './types';
@@ -105,7 +106,7 @@ export class TSURL<
     const urlMatch = match<
       Record<string, string | undefined | null | readonly string[]>
     >(pathTemplate, {
-      end: !deconstructOptions?.allowSubPaths,
+      end: !deconstructOptions?.ignoreSubPaths,
     })(parsed.pathname);
 
     if (!urlMatch) {
@@ -120,9 +121,21 @@ export class TSURL<
       arrayFormatSeparator: this.options.queryArrayFormatSeparator,
     }).query;
 
+    const serializeValueOptions: SerializeValueOptions = {
+      ignoreInvalidEnums: deconstructOptions?.ignoreInvalidEnums,
+    };
+
     return {
-      urlParams: serializeURLParams(urlMatch.params, this.schema),
-      queryParams: serializeQueryParams(queryParams, this.options.queryParams),
+      urlParams: serializeURLParams(
+        urlMatch.params,
+        this.schema,
+        serializeValueOptions
+      ),
+      queryParams: serializeQueryParams(
+        queryParams,
+        this.options.queryParams,
+        serializeValueOptions
+      ),
     };
   };
 

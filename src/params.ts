@@ -20,6 +20,33 @@ export enum PartType {
   SPLAT = 'SPLAT',
 }
 
+const extractValidEnumValues = <V extends EnumValue, K extends string>(
+  valid: readonly V[] | EnumLike<V, K>
+) => {
+  if (Array.isArray(valid)) {
+    return valid;
+  }
+
+  const values = Object.values(valid); //?
+
+  return values.reduce<readonly V[]>((acc, value) => {
+    // Numbers are always values
+    if (typeof value === 'number') {
+      return [...acc, value as V];
+    }
+
+    // String values are not stored as keys
+    if (
+      typeof value === 'string' &&
+      typeof (valid as EnumLike<V, K>)[value as unknown as K] !== 'number'
+    ) {
+      return [...acc, value as V];
+    }
+
+    return acc;
+  }, []);
+};
+
 export class RequiredString<T extends string> {
   public readonly type = PartType.REQUIRED_STRING as const;
   public readonly required = true as const;
@@ -49,6 +76,7 @@ export class RequiredBoolean<T extends string> {
     this.name = name;
   }
 }
+
 export class RequiredEnum<
   T extends string,
   V extends EnumValue,
@@ -63,21 +91,7 @@ export class RequiredEnum<
   public constructor(name: T, valid: EnumLike<V, K>);
   public constructor(name: T, valid: readonly V[] | EnumLike<V, K>) {
     this.name = name;
-    this.valid = Array.isArray(valid)
-      ? valid
-      : Object.values(valid).reduce<readonly V[]>((acc, value) => {
-          // Numbers are always values
-          if (typeof value === 'number') {
-            return [...acc, value as V];
-          }
-
-          // Strign values are not stored as keys
-          if (typeof value === 'string' && !(value in valid)) {
-            return [...acc, value as V];
-          }
-
-          return acc;
-        }, []);
+    this.valid = extractValidEnumValues(valid);
   }
 }
 
@@ -113,16 +127,19 @@ export class RequiredBooleanArray<T extends string> {
 
 export class RequiredEnumArray<
   T extends string,
-  V extends readonly EnumValue[] | Record<EnumValue, EnumValue>
+  V extends EnumValue,
+  K extends string = never
 > {
   public readonly type = PartType.REQUIRED_ENUM_ARRAY as const;
   public readonly required = true as const;
   public name: T;
-  public valid: V;
+  public valid: readonly V[];
 
-  public constructor(name: T, valid: V) {
+  public constructor(name: T, valid: readonly V[]);
+  public constructor(name: T, valid: EnumLike<V, K>);
+  public constructor(name: T, valid: readonly V[] | EnumLike<V, K>) {
     this.name = name;
-    this.valid = valid;
+    this.valid = extractValidEnumValues(valid);
   }
 }
 
@@ -158,16 +175,19 @@ export class OptionalBoolean<T extends string> {
 
 export class OptionalEnum<
   T extends string,
-  V extends readonly EnumValue[] | Record<EnumValue, EnumValue>
+  V extends EnumValue,
+  K extends string = never
 > {
   public readonly type = PartType.OPTIONAL_ENUM as const;
   public readonly required = false as const;
   public name: T;
-  public valid: V;
+  public valid: readonly V[];
 
-  public constructor(name: T, valid: V) {
+  public constructor(name: T, valid: readonly V[]);
+  public constructor(name: T, valid: EnumLike<V, K>);
+  public constructor(name: T, valid: readonly V[] | EnumLike<V, K>) {
     this.name = name;
-    this.valid = valid;
+    this.valid = extractValidEnumValues(valid);
   }
 }
 
@@ -203,16 +223,19 @@ export class OptionalBooleanArray<T extends string> {
 
 export class OptionalEnumArray<
   T extends string,
-  V extends readonly EnumValue[] | Record<EnumValue, EnumValue>
+  V extends EnumValue,
+  K extends string = never
 > {
-  public readonly type = PartType.OPTIONAL_ENUM as const;
+  public readonly type = PartType.OPTIONAL_ENUM_ARRAY as const;
   public readonly required = false as const;
   public name: T;
-  public valid: V;
+  public valid: readonly V[];
 
-  public constructor(name: T, valid: V) {
+  public constructor(name: T, valid: readonly V[]);
+  public constructor(name: T, valid: EnumLike<V, K>);
+  public constructor(name: T, valid: readonly V[] | EnumLike<V, K>) {
     this.name = name;
-    this.valid = valid;
+    this.valid = extractValidEnumValues(valid);
   }
 }
 
@@ -262,13 +285,23 @@ export const requiredNumberArray = <T extends string>(name: T) =>
 export const requiredBooleanArray = <T extends string>(name: T) =>
   new RequiredBooleanArray(name);
 
-export const requiredEnumArray = <
+export function requiredEnumArray<
   T extends string,
-  V extends readonly EnumValue[] | Record<EnumValue, EnumValue>
->(
-  name: T,
-  valid: V
-) => new RequiredEnumArray(name, valid);
+  V extends EnumValue,
+  K extends string = never
+>(name: T, valid: readonly V[]): RequiredEnumArray<T, V, K>;
+export function requiredEnumArray<
+  T extends string,
+  V extends EnumValue,
+  K extends string = never
+>(name: T, valid: EnumLike<V, K>): RequiredEnumArray<T, V, K>;
+export function requiredEnumArray<
+  T extends string,
+  V extends EnumValue,
+  K extends string = never
+>(name: T, valid: readonly V[] | EnumLike<V, K>) {
+  return new RequiredEnumArray(name, valid as EnumLike<V, K>);
+}
 
 export const optionalString = <T extends string>(name: T) =>
   new OptionalString(name);
@@ -279,13 +312,23 @@ export const optionalNumber = <T extends string>(name: T) =>
 export const optionalBoolean = <T extends string>(name: T) =>
   new OptionalBoolean(name);
 
-export const optionalEnum = <
+export function optionalEnum<
   T extends string,
-  V extends readonly EnumValue[] | Record<EnumValue, EnumValue>
->(
-  name: T,
-  valid: V
-) => new OptionalEnum(name, valid);
+  V extends EnumValue,
+  K extends string = never
+>(name: T, valid: readonly V[]): OptionalEnum<T, V, K>;
+export function optionalEnum<
+  T extends string,
+  V extends EnumValue,
+  K extends string = never
+>(name: T, valid: EnumLike<V, K>): OptionalEnum<T, V, K>;
+export function optionalEnum<
+  T extends string,
+  V extends EnumValue,
+  K extends string = never
+>(name: T, valid: readonly V[] | EnumLike<V, K>) {
+  return new OptionalEnum(name, valid as EnumLike<V, K>);
+}
 
 export const optionalStringArray = <T extends string>(name: T) =>
   new OptionalStringArray(name);
@@ -296,12 +339,22 @@ export const optionalNumberArray = <T extends string>(name: T) =>
 export const optionalBooleanArray = <T extends string>(name: T) =>
   new OptionalBooleanArray(name);
 
-export const optionalEnumArray = <
+export function optionalEnumArray<
   T extends string,
-  V extends readonly EnumValue[] | Record<EnumValue, EnumValue>
->(
-  name: T,
-  valid: V
-) => new OptionalEnumArray(name, valid);
+  V extends EnumValue,
+  K extends string = never
+>(name: T, valid: readonly V[]): OptionalEnumArray<T, V, K>;
+export function optionalEnumArray<
+  T extends string,
+  V extends EnumValue,
+  K extends string = never
+>(name: T, valid: EnumLike<V, K>): OptionalEnumArray<T, V, K>;
+export function optionalEnumArray<
+  T extends string,
+  V extends EnumValue,
+  K extends string = never
+>(name: T, valid: readonly V[] | EnumLike<V, K>) {
+  return new OptionalEnumArray(name, valid as EnumLike<V, K>);
+}
 
 export const splat = <T extends string>(name: T) => new Splat(name);
