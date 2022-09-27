@@ -43,6 +43,7 @@ export const test = api.createTSURL([
   requiredString('userId'),
   optionalString('optional'),
   requiredEnum('inviteToken', Things),
+  requiredEnum('inviteToken2', ['one', 'two', 'three'] as const),
   // optionalEnum('inviteToken', ['one', 'two', 'three'] as const),
 ]);
 
@@ -50,7 +51,8 @@ const url = test.constructURL(
   {
     companyId: 'test',
     userId: 'yest',
-    inviteToken: Things.THING_TWO,
+    inviteToken: 'TWO',
+    inviteToken2: 'four',
     // inviteToken: 'one',
     // inviteToken: 'thing1',
   },

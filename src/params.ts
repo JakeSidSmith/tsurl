@@ -49,14 +49,19 @@ export class RequiredBoolean<T extends string> {
     this.name = name;
   }
 }
-
-export class RequiredEnum<T extends string, V extends EnumValue> {
+export class RequiredEnum<
+  T extends string,
+  V extends EnumValue,
+  K extends string = never
+> {
   public readonly type = PartType.REQUIRED_ENUM as const;
   public readonly required = true as const;
   public name: T;
   public valid: readonly V[];
 
-  public constructor(name: T, valid: readonly V[] | EnumLike<V>) {
+  public constructor(name: T, valid: readonly V[]);
+  public constructor(name: T, valid: EnumLike<V, K>);
+  public constructor(name: T, valid: readonly V[] | EnumLike<V, K>) {
     this.name = name;
     this.valid = Array.isArray(valid)
       ? valid
@@ -230,10 +235,23 @@ export const requiredNumber = <T extends string>(name: T) =>
 export const requiredBoolean = <T extends string>(name: T) =>
   new RequiredBoolean(name);
 
-export const requiredEnum = <T extends string, V extends EnumValue>(
-  name: T,
-  valid: readonly V[] | EnumLike<V>
-) => new RequiredEnum(name, valid);
+export function requiredEnum<
+  T extends string,
+  V extends EnumValue,
+  K extends string = never
+>(name: T, valid: readonly V[]): RequiredEnum<T, V, K>;
+export function requiredEnum<
+  T extends string,
+  V extends EnumValue,
+  K extends string = never
+>(name: T, valid: EnumLike<V, K>): RequiredEnum<T, V, K>;
+export function requiredEnum<
+  T extends string,
+  V extends EnumValue,
+  K extends string = never
+>(name: T, valid: readonly V[] | EnumLike<V, K>) {
+  return new RequiredEnum(name, valid as EnumLike<V, K>);
+}
 
 export const requiredStringArray = <T extends string>(name: T) =>
   new RequiredStringArray(name);

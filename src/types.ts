@@ -21,8 +21,8 @@ import type {
 
 export type EnumValue = string | number;
 
-export type EnumLike<T extends EnumValue, T2 extends EnumValue> = {
-  [P in T]: T2;
+export type EnumLike<V extends EnumValue, K extends string = never> = {
+  [P in K]: V;
 };
 
 export type RequiredPart<T extends string> =
