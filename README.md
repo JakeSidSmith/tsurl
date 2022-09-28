@@ -331,6 +331,7 @@ This is the second argument to the `deconstruct` function.
 Options include:
 
 - `ignoreSubPaths` - `boolean` - whether the deconstruction will allow sub-paths (stuff that appears after your defined template) in the provided URL/path
+- `ignoreInvalidEnums` - `boolean` - whether the deconstruction will error if the URL contains values for enum restricted fields that do not adhere to the enum
 
 ### Parameters
 
@@ -341,9 +342,11 @@ The URL schema supports the following:
 - `requiredString`
 - `requiredNumber`
 - `requiredBoolean`
+- `requiredEnum`
 - `optionalString`
 - `optionalNumber`
 - `optionalBoolean`
+- `optionalEnum`
 - `splat`
 
 The query params schema supports the following:
@@ -351,15 +354,19 @@ The query params schema supports the following:
 - `requiredString`
 - `requiredNumber`
 - `requiredBoolean`
+- `requiredEnum`
 - `optionalString`
 - `optionalNumber`
 - `optionalBoolean`
+- `optionalEnum`
 - `requiredStringArray`
 - `requiredNumberArray`
 - `requiredBooleanArray`
+- `requiredEnumArray`
 - `optionalStringArray`
 - `optionalNumberArray`
 - `optionalBooleanArray`
+- `optionalEnumArray`
 
 ## Contributing
 
