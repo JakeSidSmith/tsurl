@@ -98,10 +98,7 @@ export const serializeValue = <T extends string>(
       return value;
     }
 
-    const validValues = Array.isArray(part.valid)
-      ? part.valid
-      : Object.values(part.valid);
-    const validValue = validValues.find((v) => v.toString() === value);
+    const validValue = part.valid.find((v) => v.toString() === value);
 
     if (validValue !== undefined) {
       return validValue;
@@ -192,16 +189,8 @@ export const serializeValue = <T extends string>(
     (part instanceof RequiredEnumArray || part instanceof OptionalEnumArray) &&
     (typeof value === 'string' || Array.isArray(value))
   ) {
-    if (part instanceof OptionalEnumArray && value === undefined) {
-      return value;
-    }
-
-    const validValues = Array.isArray(part.valid)
-      ? part.valid
-      : Object.values(part.valid);
-
     return ([] as readonly (string | number)[]).concat(value).map((sub) => {
-      const validValue = validValues.find((v) => v.toString() === sub);
+      const validValue = part.valid.find((v) => v.toString() === sub);
 
       if (validValue !== undefined) {
         return validValue;
@@ -245,6 +234,7 @@ export const serializeURLParams = <
     | boolean
     | readonly string[]
     | readonly number[]
+    | readonly (string | number)[]
     | readonly boolean[]
   > = {};
 
@@ -281,6 +271,7 @@ export const serializeQueryParams = <
     | number
     | boolean
     | readonly string[]
+    | readonly (string | number)[]
     | readonly number[]
     | readonly boolean[]
   > = {};

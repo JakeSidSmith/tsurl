@@ -491,7 +491,7 @@ describe('params', () => {
       }
     );
 
-    // @tsassert: (urlParams: { required: string; } & { optional?: string | undefined; }, queryParams: { requiredQ: string; } & { optionalQ?: string | undefined; }) => string
+    // @tsassert: (urlParams: { required: TestEnumMixed; } & { optional?: TestEnumMixed | undefined; }, queryParams: { requiredQ: TestEnumMixed; } & { optionalQ?: TestEnumMixed | undefined; }) => string
     const constructPath = url.constructPath;
 
     expect(
@@ -507,7 +507,7 @@ describe('params', () => {
       )
     ).toBe('/api/example/3/test/FIVE?optionalQ=2.1&requiredQ=SECOND');
 
-    // @tsassert: (url: string, deconstructOptions?: DeconstructOptions | undefined) => { urlParams: { required: string; } & { optional?: string | undefined; }; queryParams: { requiredQ: string; } & { optionalQ?: string | undefined; }; }
+    // @tsassert: (url: string, deconstructOptions?: DeconstructOptions | undefined) => { urlParams: { required: TestEnumMixed; } & { optional?: TestEnumMixed | undefined; }; queryParams: { requiredQ: TestEnumMixed; } & { optionalQ?: TestEnumMixed | undefined; }; }
     const deconstruct = url.deconstruct;
 
     expect(deconstruct('/api/example/SECOND/test?requiredQ=4')).toEqual({
