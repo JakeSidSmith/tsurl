@@ -25,7 +25,6 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-node-
       - run: npm ci
-      - run: npm run dist
       - run: npm test
       - name: Archive code coverage results
         uses: actions/upload-artifact@v3
