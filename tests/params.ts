@@ -1,17 +1,45 @@
 import createTSURL, {
   optionalBoolean,
   optionalBooleanArray,
+  optionalEnum,
+  optionalEnumArray,
   optionalNumber,
   optionalNumberArray,
   optionalString,
   optionalStringArray,
   requiredBoolean,
   requiredBooleanArray,
+  requiredEnum,
+  requiredEnumArray,
   requiredNumber,
   requiredNumberArray,
   requiredString,
   requiredStringArray,
 } from '../src';
+
+enum TestEnumNumber {
+  ONE,
+  TWO,
+  THREE,
+}
+
+enum TestEnumString {
+  ONE = 'ONE',
+  TWO = 'TWO',
+  THREE = 'THREE',
+}
+
+enum TestEnumMixed {
+  ONE,
+  TWO = 'SECOND',
+  THREE = 3,
+  FOUR,
+  FIVE = 'FIVE',
+  SIX = 2.0,
+  SEVEN = 2.1,
+  EIGHT = '2.0',
+  NINE = '2.1',
+}
 
 describe('params', () => {
   it('should all be handled by the TSURL deconstruct method (without optional values)', () => {
@@ -25,6 +53,17 @@ describe('params', () => {
         optionalString('d'),
         optionalNumber('e'),
         optionalBoolean('f'),
+        requiredEnum('g1', ['one', 'two', 'three'] as const),
+        requiredEnum('g2', TestEnumNumber),
+        requiredEnum('g3', TestEnumString),
+        requiredEnum('g4', TestEnumMixed),
+        requiredEnum('g5', TestEnumMixed),
+        requiredEnum('g6', TestEnumMixed),
+        requiredEnum('g7', TestEnumMixed),
+        optionalEnum('h1', ['one', 'two', 'three'] as const),
+        optionalEnum('h2', TestEnumNumber),
+        optionalEnum('h3', TestEnumString),
+        optionalEnum('h4', TestEnumMixed),
       ],
       {
         queryParams: [
@@ -41,12 +80,23 @@ describe('params', () => {
           optionalStringArray('j'),
           optionalNumberArray('k'),
           optionalBooleanArray('l'),
+          requiredEnum('m', TestEnumMixed),
+          optionalEnum('n', TestEnumMixed),
+          requiredEnumArray('o1', ['one', 'two', 'three'] as const),
+          requiredEnumArray('o2', TestEnumNumber),
+          requiredEnumArray('o3', TestEnumString),
+          requiredEnumArray('o4', TestEnumMixed),
+          optionalEnumArray('p1', ['one', 'two', 'three'] as const),
+          optionalEnumArray('p2', TestEnumNumber),
+          optionalEnumArray('p3', TestEnumString),
+          optionalEnumArray('p4', TestEnumMixed),
         ],
       }
     );
 
     const urlString =
-      '/api/test/a/1/true/false/?a=a&b=1&c1=true&c2=false&g=g1&g=g2&h=1&h=2&i=true&i=false';
+      '/api/test/a/1/true/false/two/1/THREE/3/2.0/2.1/FIVE' +
+      '?a=a&b=1&c1=true&c2=false&g=g1&g=g2&h=1&h=2&i=true&i=false&m=SECOND&o1=one&o1=three&o2=1&o2=2&o3=ONE&o3=THREE&o4=SECOND&o4=4';
 
     expect(url.deconstruct(urlString)).toEqual({
       urlParams: {
@@ -57,6 +107,17 @@ describe('params', () => {
         d: undefined,
         e: undefined,
         f: undefined,
+        g1: 'two',
+        g2: 1,
+        g3: 'THREE',
+        g4: 3,
+        g5: '2.0',
+        g6: 2.1,
+        g7: 'FIVE',
+        h1: undefined,
+        h2: undefined,
+        h3: undefined,
+        h4: undefined,
       },
       queryParams: {
         a: 'a',
@@ -72,6 +133,16 @@ describe('params', () => {
         j: undefined,
         k: undefined,
         l: undefined,
+        m: 'SECOND',
+        n: undefined,
+        o1: ['one', 'three'],
+        o2: [1, 2],
+        o3: ['ONE', 'THREE'],
+        o4: ['SECOND', 4],
+        p1: undefined,
+        p2: undefined,
+        p3: undefined,
+        p4: undefined,
       },
     });
   });
@@ -87,6 +158,17 @@ describe('params', () => {
         optionalString('d'),
         optionalNumber('e'),
         optionalBoolean('f'),
+        requiredEnum('g1', ['one', 'two', 'three'] as const),
+        requiredEnum('g2', TestEnumNumber),
+        requiredEnum('g3', TestEnumString),
+        requiredEnum('g4', TestEnumMixed),
+        requiredEnum('g5', TestEnumMixed),
+        requiredEnum('g6', TestEnumMixed),
+        requiredEnum('g7', TestEnumMixed),
+        optionalEnum('h1', ['one', 'two', 'three'] as const),
+        optionalEnum('h2', TestEnumNumber),
+        optionalEnum('h3', TestEnumString),
+        optionalEnum('h4', TestEnumMixed),
       ],
       {
         queryParams: [
@@ -104,12 +186,26 @@ describe('params', () => {
           optionalStringArray('j'),
           optionalNumberArray('k'),
           optionalBooleanArray('l'),
+          requiredEnum('m', TestEnumMixed),
+          optionalEnum('n', TestEnumMixed),
+          requiredEnumArray('o1', ['one', 'two', 'three'] as const),
+          requiredEnumArray('o2', TestEnumNumber),
+          requiredEnumArray('o3', TestEnumString),
+          requiredEnumArray('o4', TestEnumMixed),
+          optionalEnumArray('p1', ['one', 'two', 'three'] as const),
+          optionalEnumArray('p2', TestEnumNumber),
+          optionalEnumArray('p3', TestEnumString),
+          optionalEnumArray('p4', TestEnumMixed),
         ],
       }
     );
 
     const urlString =
-      '/api/test/a/1/true/false/d/2/true?a=a&b=1&c1=true&c2=false&d=d&e=2&f1=true&f2=false&g=g1&g=g2&h=1&h=2&i=true&i=false&j=j&k=3&l=false&l=true';
+      '/api/test/a/1/true/false/d/2/true/two/1/THREE/3/2.0/2.1/FIVE/two/2/ONE/4' +
+      '?a=a&b=1&c1=true&c2=false&d=d&e=2&f1=true&f2=false&g=g1&g=g2&h=1&h=2&i=true&i=false&j=j&k=3&l=false&l=true' +
+      '&m=0&n=FIVE&o1=two&o1=three&o2=0&o2=2&' +
+      'o3=ONE&o3=THREE&o4=3&o4=2.0&p1=two&p1=three&p2=0&p2=2' +
+      '&p3=ONE&p3=THREE&p4=0&p4=SECOND&p4=3&p4=4&p4=FIVE&p4=2.0&p4=2.1';
 
     expect(url.deconstruct(urlString)).toEqual({
       urlParams: {
@@ -120,6 +216,17 @@ describe('params', () => {
         d: 'd',
         e: 2,
         f: true,
+        g1: 'two',
+        g2: 1,
+        g3: 'THREE',
+        g4: 3,
+        g5: '2.0',
+        g6: 2.1,
+        g7: 'FIVE',
+        h1: 'two',
+        h2: 2,
+        h3: 'ONE',
+        h4: 4,
       },
       queryParams: {
         a: 'a',
@@ -136,6 +243,16 @@ describe('params', () => {
         j: ['j'],
         k: [3],
         l: [false, true],
+        m: 0,
+        n: 'FIVE',
+        o1: ['two', 'three'],
+        o2: [0, 2],
+        o3: ['ONE', 'THREE'],
+        o4: [3, '2.0'],
+        p1: ['two', 'three'],
+        p2: [0, 2],
+        p3: ['ONE', 'THREE'],
+        p4: [0, 'SECOND', 3, 4, 'FIVE', '2.0', 2.1],
       },
     });
   });
@@ -298,6 +415,121 @@ describe('params', () => {
       queryParams: {
         requiredQ: true,
         optionalQ: false,
+      },
+    });
+  });
+
+  it('should handle constructing and deconstructing both required and optional enums (array of values)', () => {
+    const url = createTSURL(
+      [
+        '/api/example',
+        requiredEnum('required', ['a', 'b', 'c'] as const),
+        'test',
+        optionalEnum('optional', ['d', 'e', 'f'] as const),
+      ],
+      {
+        queryParams: [
+          requiredEnum('requiredQ', ['a', 'b', 'c'] as const),
+          optionalEnum('optionalQ', ['d', 'e', 'f'] as const),
+        ],
+      }
+    );
+
+    // @tsassert: (urlParams: { required: "a" | "b" | "c"; } & { optional?: "d" | "e" | "f" | undefined; }, queryParams: { requiredQ: "a" | "b" | "c"; } & { optionalQ?: "d" | "e" | "f" | undefined; }) => string
+    const constructPath = url.constructPath;
+
+    expect(constructPath({ required: 'a' }, { requiredQ: 'b' })).toBe(
+      '/api/example/a/test/?requiredQ=b'
+    );
+    expect(
+      constructPath(
+        { required: 'a', optional: 'e' },
+        { requiredQ: 'b', optionalQ: 'f' }
+      )
+    ).toBe('/api/example/a/test/e?optionalQ=f&requiredQ=b');
+
+    // @tsassert: (url: string, deconstructOptions?: DeconstructOptions | undefined) => { urlParams: { required: "a" | "b" | "c"; } & { optional?: "d" | "e" | "f" | undefined; }; queryParams: { requiredQ: "a" | "b" | "c"; } & { optionalQ?: "d" | "e" | "f" | undefined; }; }
+    const deconstruct = url.deconstruct;
+
+    expect(deconstruct('/api/example/a/test?requiredQ=c')).toEqual({
+      urlParams: {
+        required: 'a',
+        optional: undefined,
+      },
+      queryParams: {
+        requiredQ: 'c',
+        optionalQ: undefined,
+      },
+    });
+    expect(
+      deconstruct('/api/example/a/test/e?requiredQ=c&optionalQ=d')
+    ).toEqual({
+      urlParams: {
+        required: 'a',
+        optional: 'e',
+      },
+      queryParams: {
+        requiredQ: 'c',
+        optionalQ: 'd',
+      },
+    });
+  });
+
+  it('should handle constructing and deconstructing both required and optional enums (enum)', () => {
+    const url = createTSURL(
+      [
+        '/api/example',
+        requiredEnum('required', TestEnumMixed),
+        'test',
+        optionalEnum('optional', TestEnumMixed),
+      ],
+      {
+        queryParams: [
+          requiredEnum('requiredQ', TestEnumMixed),
+          optionalEnum('optionalQ', TestEnumMixed),
+        ],
+      }
+    );
+
+    // @tsassert: (urlParams: { required: TestEnumMixed; } & { optional?: TestEnumMixed | undefined; }, queryParams: { requiredQ: TestEnumMixed; } & { optionalQ?: TestEnumMixed | undefined; }) => string
+    const constructPath = url.constructPath;
+
+    expect(
+      constructPath(
+        { required: TestEnumMixed.ONE },
+        { requiredQ: TestEnumMixed.TWO }
+      )
+    ).toBe('/api/example/0/test/?requiredQ=SECOND');
+    expect(
+      constructPath(
+        { required: TestEnumMixed.THREE, optional: TestEnumMixed.FIVE },
+        { requiredQ: TestEnumMixed.TWO, optionalQ: TestEnumMixed.SEVEN }
+      )
+    ).toBe('/api/example/3/test/FIVE?optionalQ=2.1&requiredQ=SECOND');
+
+    // @tsassert: (url: string, deconstructOptions?: DeconstructOptions | undefined) => { urlParams: { required: TestEnumMixed; } & { optional?: TestEnumMixed | undefined; }; queryParams: { requiredQ: TestEnumMixed; } & { optionalQ?: TestEnumMixed | undefined; }; }
+    const deconstruct = url.deconstruct;
+
+    expect(deconstruct('/api/example/SECOND/test?requiredQ=4')).toEqual({
+      urlParams: {
+        required: TestEnumMixed.TWO,
+        optional: undefined,
+      },
+      queryParams: {
+        requiredQ: TestEnumMixed.FOUR,
+        optionalQ: undefined,
+      },
+    });
+    expect(
+      deconstruct('/api/example/2.1/test/4?requiredQ=SECOND&optionalQ=0')
+    ).toEqual({
+      urlParams: {
+        required: 2.1,
+        optional: 4,
+      },
+      queryParams: {
+        requiredQ: 'SECOND',
+        optionalQ: 0,
       },
     });
   });

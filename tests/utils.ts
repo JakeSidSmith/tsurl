@@ -1,6 +1,7 @@
 import {
   optionalBoolean,
   optionalBooleanArray,
+  optionalEnumArray,
   optionalNumber,
   optionalNumberArray,
   optionalString,
@@ -48,6 +49,15 @@ describe('serializeValue', () => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       serializeValue(optionalBooleanArray('test'), null as any)
     ).toThrow('Invalid value for');
+  });
+
+  it('should return undefined for optional arrays with no values', () => {
+    expect(serializeValue(optionalStringArray('test'), [])).toBeUndefined();
+    expect(serializeValue(optionalNumberArray('test'), [])).toBeUndefined();
+    expect(serializeValue(optionalBooleanArray('test'), [])).toBeUndefined();
+    expect(
+      serializeValue(optionalEnumArray('test', ['a'] as const), [])
+    ).toBeUndefined();
   });
 });
 

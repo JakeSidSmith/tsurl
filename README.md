@@ -193,9 +193,9 @@ url.deconstruct('https://server.com/api/user/123/posts/123');
 // returns { urlParams: { userId: '123', splat: ['posts', '123'] }, queryParams: {} }
 ```
 
-## Allow sub-paths when you don't want to match a splat
+## Ignore sub-paths when you don't want to match a splat
 
-In some cases you want your URL templates to match a specific template, but when deconstructing you don't mind if the URL/path contains additional sub-paths. In these cases you can pass the `allowSubPaths` option to the deconstruct method.
+In some cases you want your URL templates to match a specific template, but when deconstructing you don't mind if the URL/path contains additional sub-paths. In these cases you can pass the `ignoreSubPaths` option to the deconstruct method.
 
 ```ts
 const url = createTSURL(['user', requiredString('userId')], {
@@ -208,7 +208,7 @@ url.deconstruct('https://server.com/api/user/123/posts/123');
 // throws an error
 
 url.deconstruct('https://server.com/api/user/123/posts/123', {
-  allowSubPaths: true,
+  ignoreSubPaths: true,
 });
 // returns { urlParams: { userId: '123' }, queryParams: {} }
 ```
@@ -330,7 +330,8 @@ This is the second argument to the `deconstruct` function.
 
 Options include:
 
-- `allowSubPaths` - `boolean` - whether the deconstruction will allow sub-paths (stuff that appears after your defined template) in the provided URL/path
+- `ignoreSubPaths` - `boolean` - whether the deconstruction will allow sub-paths (stuff that appears after your defined template) in the provided URL/path
+- `ignoreInvalidEnums` - `boolean` - whether the deconstruction will error or omit invalid values if the URL contains values for enum restricted fields that do not adhere to the enum (does not apply to `requiredEnum` fields)
 
 ### Parameters
 
@@ -341,9 +342,11 @@ The URL schema supports the following:
 - `requiredString`
 - `requiredNumber`
 - `requiredBoolean`
+- `requiredEnum`
 - `optionalString`
 - `optionalNumber`
 - `optionalBoolean`
+- `optionalEnum`
 - `splat`
 
 The query params schema supports the following:
@@ -351,15 +354,19 @@ The query params schema supports the following:
 - `requiredString`
 - `requiredNumber`
 - `requiredBoolean`
+- `requiredEnum`
 - `optionalString`
 - `optionalNumber`
 - `optionalBoolean`
+- `optionalEnum`
 - `requiredStringArray`
 - `requiredNumberArray`
 - `requiredBooleanArray`
+- `requiredEnumArray`
 - `optionalStringArray`
 - `optionalNumberArray`
 - `optionalBooleanArray`
+- `optionalEnumArray`
 
 ## Contributing
 

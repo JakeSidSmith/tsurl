@@ -10,6 +10,8 @@ import {
 import {
   OptionalBoolean,
   OptionalBooleanArray,
+  OptionalEnum,
+  OptionalEnumArray,
   OptionalNumber,
   OptionalNumberArray,
   OptionalString,
@@ -17,6 +19,8 @@ import {
   PartType,
   RequiredBoolean,
   RequiredBooleanArray,
+  RequiredEnum,
+  RequiredEnumArray,
   RequiredNumber,
   RequiredNumberArray,
   RequiredString,
@@ -25,17 +29,23 @@ import {
 } from './params';
 import {
   AnyPart,
+  EnumValue,
   InferQueryParams,
   InferURLParams,
   QueryParamsSchema,
+  SerializeValueOptions,
   TSURLOptions,
   URLParamsSchema,
 } from './types';
 
 export const serializeValue = <T extends string>(
   part: AnyPart<T>,
-  value: string | undefined | readonly string[]
+  value: string | undefined | readonly string[],
+  options?: SerializeValueOptions
 ) => {
+  const { ignoreInvalidEnums = false } = options || {};
+  const valueErrorMessage = `Invalid value for part "${part.name}" - ${value}`;
+
   if (part instanceof RequiredString && typeof value === 'string') {
     return value;
   }
@@ -85,16 +95,39 @@ export const serializeValue = <T extends string>(
     }
   }
 
+  if (part instanceof RequiredEnum || part instanceof OptionalEnum) {
+    const validValue = part.valid.find((v) => v.toString() === value);
+
+    if (typeof validValue !== 'undefined') {
+      return validValue;
+    } else if (
+      part instanceof OptionalEnum &&
+      (typeof value === 'undefined' || ignoreInvalidEnums)
+    ) {
+      return undefined;
+    }
+  }
+
   if (
     part instanceof RequiredStringArray &&
     (typeof value === 'string' || Array.isArray(value))
   ) {
-    return ([] as readonly string[]).concat(value);
+    const values = ([] as readonly string[]).concat(value);
+
+    if (values.length) {
+      return values;
+    }
   }
 
   if (part instanceof OptionalStringArray) {
     if (typeof value === 'string' || Array.isArray(value)) {
-      return ([] as readonly string[]).concat(value);
+      const values = ([] as readonly string[]).concat(value);
+
+      if (values.length) {
+        return values;
+      }
+
+      return undefined;
     }
 
     if (typeof value === 'undefined') {
@@ -106,16 +139,26 @@ export const serializeValue = <T extends string>(
     part instanceof RequiredNumberArray &&
     (typeof value === 'string' || Array.isArray(value))
   ) {
-    return ([] as readonly string[])
+    const values = ([] as readonly string[])
       .concat(value)
       .map((sub) => parseFloat(sub));
+
+    if (values.length) {
+      return values;
+    }
   }
 
   if (part instanceof OptionalNumberArray) {
     if (typeof value === 'string' || Array.isArray(value)) {
-      return ([] as readonly string[])
+      const values = ([] as readonly string[])
         .concat(value)
         .map((sub) => parseFloat(sub));
+
+      if (values.length) {
+        return values;
+      }
+
+      return undefined;
     }
 
     if (typeof value === 'undefined') {
@@ -127,7 +170,7 @@ export const serializeValue = <T extends string>(
     part instanceof RequiredBooleanArray &&
     (typeof value === 'string' || Array.isArray(value))
   ) {
-    return ([] as readonly string[]).concat(value).map((sub) => {
+    const values = ([] as readonly string[]).concat(value).map((sub) => {
       if (sub === 'true') {
         return true;
       }
@@ -136,13 +179,17 @@ export const serializeValue = <T extends string>(
         return false;
       }
 
-      throw new Error(`Invalid value for part "${part.name}" - ${value}`);
+      throw new Error(valueErrorMessage);
     });
+
+    if (values.length) {
+      return values;
+    }
   }
 
   if (part instanceof OptionalBooleanArray) {
     if (typeof value === 'string' || Array.isArray(value)) {
-      return ([] as readonly string[]).concat(value).map((sub) => {
+      const values = ([] as readonly string[]).concat(value).map((sub) => {
         if (sub === 'true') {
           return true;
         }
@@ -151,13 +198,50 @@ export const serializeValue = <T extends string>(
           return false;
         }
 
-        throw new Error(`Invalid value for part "${part.name}" - ${value}`);
+        throw new Error(valueErrorMessage);
       });
+
+      if (values.length) {
+        return values;
+      }
+
+      return undefined;
     }
 
     if (typeof value === 'undefined') {
       return value;
     }
+  }
+
+  if (
+    (part instanceof RequiredEnumArray || part instanceof OptionalEnumArray) &&
+    (typeof value === 'string' || Array.isArray(value))
+  ) {
+    const values = ([] as readonly (string | number)[])
+      .concat(value)
+      .reduce<readonly EnumValue[]>((acc, sub) => {
+        const validValue = part.valid.find((v) => v.toString() === sub);
+
+        if (typeof validValue !== 'undefined') {
+          return [...acc, validValue];
+        } else if (ignoreInvalidEnums) {
+          return acc;
+        }
+
+        throw new Error(valueErrorMessage);
+      }, []);
+
+    if (values.length) {
+      return values;
+    }
+
+    if (part instanceof OptionalEnumArray) {
+      return undefined;
+    }
+  }
+
+  if (part instanceof OptionalEnumArray && typeof value === 'undefined') {
+    return undefined;
   }
 
   if (part instanceof Splat) {
@@ -170,14 +254,15 @@ export const serializeValue = <T extends string>(
     }
   }
 
-  throw new Error(`Invalid value for part "${part.name}" - ${value}`);
+  throw new Error(valueErrorMessage);
 };
 
 export const serializeURLParams = <
   S extends URLParamsSchema = readonly never[]
 >(
   params: Record<string, string | undefined | null | readonly string[]>,
-  schema: S
+  schema: S,
+  options?: SerializeValueOptions
 ) => {
   const serializedParams: Record<
     string,
@@ -187,6 +272,7 @@ export const serializeURLParams = <
     | boolean
     | readonly string[]
     | readonly number[]
+    | readonly (string | number)[]
     | readonly boolean[]
   > = {};
 
@@ -202,7 +288,7 @@ export const serializeURLParams = <
         throw new Error(`Invalid null value for URL param "${part.name}"`);
       }
 
-      serializedParams[part.name] = serializeValue(part, value);
+      serializedParams[part.name] = serializeValue(part, value, options);
     }
   });
 
@@ -213,7 +299,8 @@ export const serializeQueryParams = <
   Q extends QueryParamsSchema = readonly never[]
 >(
   params: Record<string, string | undefined | null | readonly string[]>,
-  schema: Q
+  schema: Q,
+  options?: SerializeValueOptions
 ) => {
   const serializedParams: Record<
     string,
@@ -222,6 +309,7 @@ export const serializeQueryParams = <
     | number
     | boolean
     | readonly string[]
+    | readonly (string | number)[]
     | readonly number[]
     | readonly boolean[]
   > = {};
@@ -237,7 +325,7 @@ export const serializeQueryParams = <
       throw new Error(`Invalid null value for URL param "${part.name}"`);
     }
 
-    serializedParams[part.name] = serializeValue(part, value);
+    serializedParams[part.name] = serializeValue(part, value, options);
   });
 
   return serializedParams as InferQueryParams<Q>;
