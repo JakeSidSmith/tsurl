@@ -423,19 +423,19 @@ describe('params', () => {
     const url = createTSURL(
       [
         '/api/example',
-        requiredEnum('required', ['a', 'b', 'c']),
+        requiredEnum('required', ['a', 'b', 'c'] as const),
         'test',
-        optionalEnum('optional', ['d', 'e', 'f']),
+        optionalEnum('optional', ['d', 'e', 'f'] as const),
       ],
       {
         queryParams: [
-          requiredEnum('requiredQ', ['a', 'b', 'c']),
-          optionalEnum('optionalQ', ['d', 'e', 'f']),
+          requiredEnum('requiredQ', ['a', 'b', 'c'] as const),
+          optionalEnum('optionalQ', ['d', 'e', 'f'] as const),
         ],
       }
     );
 
-    // @tsassert: (urlParams: { required: string; } & { optional?: string | undefined; }, queryParams: { requiredQ: string; } & { optionalQ?: string | undefined; }) => string
+    // @tsassert: (urlParams: { required: "a" | "b" | "c"; } & { optional?: "d" | "e" | "f" | undefined; }, queryParams: { requiredQ: "a" | "b" | "c"; } & { optionalQ?: "d" | "e" | "f" | undefined; }) => string
     const constructPath = url.constructPath;
 
     expect(constructPath({ required: 'a' }, { requiredQ: 'b' })).toBe(
@@ -448,7 +448,7 @@ describe('params', () => {
       )
     ).toBe('/api/example/a/test/e?optionalQ=f&requiredQ=b');
 
-    // @tsassert: (url: string, deconstructOptions?: DeconstructOptions | undefined) => { urlParams: { required: string; } & { optional?: string | undefined; }; queryParams: { requiredQ: string; } & { optionalQ?: string | undefined; }; }
+    // @tsassert: (url: string, deconstructOptions?: DeconstructOptions | undefined) => { urlParams: { required: "a" | "b" | "c"; } & { optional?: "d" | "e" | "f" | undefined; }; queryParams: { requiredQ: "a" | "b" | "c"; } & { optionalQ?: "d" | "e" | "f" | undefined; }; }
     const deconstruct = url.deconstruct;
 
     expect(deconstruct('/api/example/a/test?requiredQ=c')).toEqual({
