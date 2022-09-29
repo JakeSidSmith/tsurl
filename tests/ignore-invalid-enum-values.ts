@@ -148,7 +148,7 @@ describe('ignoreInvalidEnums', () => {
     ).toEqual({
       urlParams: {},
       queryParams: {
-        test1: [],
+        test1: undefined,
       },
     });
   });
