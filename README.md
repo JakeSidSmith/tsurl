@@ -331,7 +331,7 @@ This is the second argument to the `deconstruct` function.
 Options include:
 
 - `ignoreSubPaths` - `boolean` - whether the deconstruction will allow sub-paths (stuff that appears after your defined template) in the provided URL/path
-- `ignoreInvalidEnums` - `boolean` - whether the deconstruction will error if the URL contains values for enum restricted fields that do not adhere to the enum
+- `ignoreInvalidEnums` - `boolean` - whether the deconstruction will error or omit invalid values if the URL contains values for enum restricted fields that do not adhere to the enum (does not apply to `requiredEnum` fields)
 
 ### Parameters
 

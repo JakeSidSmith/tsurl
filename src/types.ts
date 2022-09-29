@@ -170,7 +170,7 @@ export type InferQueryParams<Q extends QueryParamsSchema = readonly never[]> =
           : V extends RequiredBooleanArray<P>
           ? readonly boolean[]
           : V extends RequiredEnumArray<P, infer Value>
-          ? Value[]
+          ? readonly Value[]
           : never;
       } & {
         [P in V extends
@@ -198,7 +198,7 @@ export type InferQueryParams<Q extends QueryParamsSchema = readonly never[]> =
           : V extends OptionalBooleanArray<P>
           ? readonly boolean[]
           : V extends OptionalEnumArray<P, infer Value>
-          ? Value[]
+          ? readonly Value[]
           : never;
       }
     : never;

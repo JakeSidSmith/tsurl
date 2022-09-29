@@ -27,7 +27,7 @@ const extractValidEnumValues = <V extends EnumValue, K extends string>(
     return valid;
   }
 
-  const values = Object.values(valid); //?
+  const values = Object.values(valid);
 
   return values.reduce<readonly V[]>((acc, value) => {
     // Numbers are always values

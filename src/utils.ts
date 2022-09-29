@@ -29,6 +29,7 @@ import {
 } from './params';
 import {
   AnyPart,
+  EnumValue,
   InferQueryParams,
   InferURLParams,
   QueryParamsSchema,
@@ -43,6 +44,7 @@ export const serializeValue = <T extends string>(
   options?: SerializeValueOptions
 ) => {
   const { ignoreInvalidEnums = false } = options || {};
+  const valueErrorMessage = `Invalid value for part "${part.name}" - ${value}`;
 
   if (part instanceof RequiredString && typeof value === 'string') {
     return value;
@@ -94,19 +96,15 @@ export const serializeValue = <T extends string>(
   }
 
   if (part instanceof RequiredEnum || part instanceof OptionalEnum) {
-    if (part instanceof OptionalEnum && value === undefined) {
-      return value;
-    }
-
     const validValue = part.valid.find((v) => v.toString() === value);
 
     if (validValue !== undefined) {
       return validValue;
     } else if (
-      (part instanceof OptionalEnum && typeof value === 'undefined') ||
-      ignoreInvalidEnums
+      part instanceof OptionalEnum &&
+      (typeof value === 'undefined' || ignoreInvalidEnums)
     ) {
-      return value;
+      return undefined;
     }
   }
 
@@ -161,7 +159,7 @@ export const serializeValue = <T extends string>(
         return false;
       }
 
-      throw new Error(`Invalid value for part "${part.name}" - ${value}`);
+      throw new Error(valueErrorMessage);
     });
   }
 
@@ -176,7 +174,7 @@ export const serializeValue = <T extends string>(
           return false;
         }
 
-        throw new Error(`Invalid value for part "${part.name}" - ${value}`);
+        throw new Error(valueErrorMessage);
       });
     }
 
@@ -189,21 +187,29 @@ export const serializeValue = <T extends string>(
     (part instanceof RequiredEnumArray || part instanceof OptionalEnumArray) &&
     (typeof value === 'string' || Array.isArray(value))
   ) {
-    return ([] as readonly (string | number)[]).concat(value).map((sub) => {
-      const validValue = part.valid.find((v) => v.toString() === sub);
+    const values = ([] as readonly (string | number)[])
+      .concat(value)
+      .reduce<readonly EnumValue[]>((acc, sub) => {
+        const validValue = part.valid.find((v) => v.toString() === sub);
 
-      if (validValue !== undefined) {
-        return validValue;
-      } else if (ignoreInvalidEnums) {
-        return sub;
-      }
+        if (validValue !== undefined) {
+          return [...acc, validValue];
+        } else if (ignoreInvalidEnums) {
+          return acc;
+        }
 
-      throw new Error(`Invalid value for part "${part.name}" - ${value}`);
-    });
+        throw new Error(valueErrorMessage);
+      }, []);
+
+    if (part instanceof RequiredEnumArray && values.length === 0) {
+      throw new Error(valueErrorMessage);
+    }
+
+    return values;
   }
 
-  if (part instanceof OptionalEnumArray && value === undefined) {
-    return value;
+  if (part instanceof OptionalEnumArray && typeof value === 'undefined') {
+    return undefined;
   }
 
   if (part instanceof Splat) {
@@ -216,7 +222,7 @@ export const serializeValue = <T extends string>(
     }
   }
 
-  throw new Error(`Invalid value for part "${part.name}" - ${value}`);
+  throw new Error(valueErrorMessage);
 };
 
 export const serializeURLParams = <

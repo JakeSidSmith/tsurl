@@ -12,84 +12,87 @@ enum TestEnum {
 }
 
 describe('ignoreInvalidEnums', () => {
-  it('should allow deconstructing a URL or path that has invalid enum values without throwing', () => {
-    const url1 = createTSURL(
-      [
-        'test',
-        requiredEnum('test1', TestEnum),
-        optionalEnum('test2', TestEnum),
-      ],
-      {
-        baseURL: 'https://example.com',
-        basePath: '/api',
-        queryParams: [],
-      }
-    );
+  it('should throw if a "requiredEnum" has an invalid value', () => {
+    const url = createTSURL(['test', requiredEnum('test1', TestEnum)], {
+      baseURL: 'https://example.com',
+      basePath: '/api',
+      queryParams: [requiredEnum('test2', TestEnum)],
+    });
 
     expect(() =>
-      url1.deconstruct('https://example.com/api/test/FOUR/THREE')
+      url.deconstruct('https://example.com/api/test/FOUR?test2=ONE')
+    ).toThrow(/Invalid value for part "test1" - FOUR/);
+    expect(() =>
+      url.deconstruct('https://example.com/api/test/FOUR?test2=ONE', {
+        ignoreInvalidEnums: true,
+      })
+    ).toThrow(/Invalid value for part "test1" - FOUR/);
+
+    expect(() =>
+      url.deconstruct('https://example.com/api/test/ONE?test2=FOUR')
+    ).toThrow(/Invalid value for part "test2" - FOUR/);
+    expect(() =>
+      url.deconstruct('https://example.com/api/test/ONE?test2=FOUR', {
+        ignoreInvalidEnums: true,
+      })
+    ).toThrow(/Invalid value for part "test2" - FOUR/);
+  });
+
+  it('should omit invalid values if a "optionalEnum" has an invalid value', () => {
+    const url = createTSURL(['test', optionalEnum('test1', TestEnum)], {
+      baseURL: 'https://example.com',
+      basePath: '/api',
+      queryParams: [optionalEnum('test2', TestEnum)],
+    });
+
+    expect(() =>
+      url.deconstruct('https://example.com/api/test/FOUR?test2=ONE')
     ).toThrow(/Invalid value for part "test1" - FOUR/);
     expect(
-      url1.deconstruct('https://example.com/api/test/FOUR/THREE', {
+      url.deconstruct('https://example.com/api/test/FOUR?test2=ONE', {
         ignoreInvalidEnums: true,
       })
     ).toEqual({
       urlParams: {
-        test1: 'FOUR',
-        test2: 'THREE',
+        test1: undefined,
       },
-      queryParams: {},
+      queryParams: {
+        test2: 'ONE',
+      },
     });
 
     expect(() =>
-      url1.deconstruct('https://example.com/api/test/ONE/test')
-    ).toThrow(/Invalid value for part "test2" - test/);
+      url.deconstruct('https://example.com/api/test/ONE?test2=FOUR')
+    ).toThrow(/Invalid value for part "test2" - FOUR/);
     expect(
-      url1.deconstruct('https://example.com/api/test/ONE/test', {
+      url.deconstruct('https://example.com/api/test/ONE?test2=FOUR', {
         ignoreInvalidEnums: true,
       })
     ).toEqual({
       urlParams: {
         test1: 'ONE',
-        test2: 'test',
       },
-      queryParams: {},
+      queryParams: {
+        test2: undefined,
+      },
     });
+  });
 
-    const url2 = createTSURL(['test'], {
+  it('should omit invalid values if a "requiredEnumArray" has invalid values', () => {
+    const url = createTSURL(['test'], {
       baseURL: 'https://example.com',
       basePath: '/api',
-      queryParams: [
-        requiredEnum('test1', TestEnum),
-        requiredEnumArray('test2', TestEnum),
-        optionalEnum('test3', TestEnum),
-        optionalEnumArray('test4', TestEnum),
-      ],
+      queryParams: [requiredEnumArray('test1', TestEnum)],
     });
 
     expect(() =>
-      url2.deconstruct(
-        'https://example.com/api/test/?test1=FOUR&test2=ONE&test3=ONE&test4=ONE'
+      url.deconstruct(
+        'https://example.com/api/test?test1=ONE&test1=TWO&test1=FOUR'
       )
-    ).toThrow(/Invalid value for part "test1" - FOUR/);
-    expect(() =>
-      url2.deconstruct(
-        'https://example.com/api/test/?test1=ONE&test2=FOUR&test3=ONE&test4=ONE'
-      )
-    ).toThrow(/Invalid value for part "test2" - FOUR/);
-    expect(() =>
-      url2.deconstruct(
-        'https://example.com/api/test/?test1=ONE&test2=ONE&test3=FOUR&test4=ONE'
-      )
-    ).toThrow(/Invalid value for part "test3" - FOUR/);
-    expect(() =>
-      url2.deconstruct(
-        'https://example.com/api/test/?test1=ONE&test2=ONE&test3=ONE&test4=FOUR'
-      )
-    ).toThrow(/Invalid value for part "test4" - FOUR/);
+    ).toThrow(/Invalid value for part "test1" - ONE,TWO,FOUR/);
     expect(
-      url2.deconstruct(
-        'https://example.com/api/test/?test1=FOUR&test2=FOUR&test3=FOUR&test4=FOUR&test4=FIVE',
+      url.deconstruct(
+        'https://example.com/api/test?test1=ONE&test1=TWO&test1=FOUR',
         {
           ignoreInvalidEnums: true,
         }
@@ -97,10 +100,55 @@ describe('ignoreInvalidEnums', () => {
     ).toEqual({
       urlParams: {},
       queryParams: {
-        test1: 'FOUR',
-        test2: ['FOUR'],
-        test3: 'FOUR',
-        test4: ['FOUR', 'FIVE'],
+        test1: ['ONE', 'TWO'],
+      },
+    });
+    expect(() =>
+      url.deconstruct(
+        'https://example.com/api/test?test1=FOUR&test1=FIVE&test1=SIX',
+        {
+          ignoreInvalidEnums: true,
+        }
+      )
+    ).toThrow(/Invalid value for part "test1" - FOUR,FIVE,SIX/);
+  });
+
+  it('should omit invalid values if a "optionalEnumArray" has invalid values', () => {
+    const url = createTSURL(['test'], {
+      baseURL: 'https://example.com',
+      basePath: '/api',
+      queryParams: [optionalEnumArray('test1', TestEnum)],
+    });
+
+    expect(() =>
+      url.deconstruct(
+        'https://example.com/api/test?test1=ONE&test1=TWO&test1=FOUR'
+      )
+    ).toThrow(/Invalid value for part "test1" - ONE,TWO,FOUR/);
+    expect(
+      url.deconstruct(
+        'https://example.com/api/test?test1=ONE&test1=TWO&test1=FOUR',
+        {
+          ignoreInvalidEnums: true,
+        }
+      )
+    ).toEqual({
+      urlParams: {},
+      queryParams: {
+        test1: ['ONE', 'TWO'],
+      },
+    });
+    expect(
+      url.deconstruct(
+        'https://example.com/api/test?test1=FOUR&test1=FIVE&test1=SIX',
+        {
+          ignoreInvalidEnums: true,
+        }
+      )
+    ).toEqual({
+      urlParams: {},
+      queryParams: {
+        test1: [],
       },
     });
   });
